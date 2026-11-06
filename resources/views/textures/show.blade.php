@@ -12,7 +12,7 @@
 @endphp
 
 @section('content')
-<x-page-hero :title="$texture->lead()" :current="$texture->pattern" :script="$texture->script_word" :lead="'For '.lcfirst($texture->best_for).'. '.$texture->tagline" :image="$texture->image" :alt="$texture->image_alt" :crumb="['Textures', route('textures.index')]" :coil="$texture->coil">
+<x-page-hero :morph="'tex-'.$texture->slug" :title="$texture->lead()" :current="$texture->pattern" :script="$texture->script_word" :lead="'For '.lcfirst($texture->best_for).'. '.$texture->tagline" :image="$texture->image" :alt="$texture->image_alt" :crumb="['Textures', route('textures.index')]" :coil="$texture->coil">
     <a href="{{ route('preorder', ['texture' => $texture->slug]) }}" class="btn btn-primary">Pre-order {{ $texture->pattern }}</a>
     <a href="#prices" class="btn btn-ghost">See the price list</a>
 </x-page-hero>
@@ -83,10 +83,10 @@
                 <p class="max-w-[34ch] rounded-2xl border border-sand bg-white/70 p-4 text-[.98rem] text-cocoa">{{ $mto }} are made to order and quoted when we confirm.</p>
             @endif
         </div>
-        <div class="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div class="mt-12 gap-6 md:columns-2 xl:columns-3">
             @foreach($groups as $group)
-                <div class="reveal card bg-ivory p-6">
-                    <h3 class="flex items-center gap-2 text-[1.5rem]"><x-crown class="text-gold"/> {{ $group['title'] }}</h3>
+                <div class="reveal card mb-6 break-inside-avoid bg-ivory p-6">
+                    <h3 class="flex items-start gap-2 text-[1.35rem] sm:text-[1.5rem]"><x-crown class="mt-[.3em] shrink-0 text-gold"/> {{ $group['title'] }}</h3>
                     <ul class="mt-4 divide-y divide-sand">
                         @foreach($group['sets'] as $set)
                             <li>
@@ -108,8 +108,8 @@
     <h2 id="worn-h" class="reveal text-4xl">Worn by our queens</h2>
     <div class="mt-10 grid grid-cols-2 gap-4 md:grid-cols-4">
         @foreach($texture->photos->take(4) as $p)
-            <figure class="reveal overflow-hidden rounded-[1.25rem]">
-                <img src="{{ $p->url() }}" alt="{{ $p->alt }}" width="400" height="520" loading="lazy" class="aspect-[4/5] w-full object-cover">
+            <figure class="reveal">
+                <img src="{{ $p->url() }}" alt="{{ $p->alt }}" width="400" height="520" loading="lazy" class="aspect-[4/5] w-full rounded-[1.25rem] object-cover">
                 @if($p->caption)<figcaption class="mt-2 text-[.95rem] text-cocoa">{{ $p->caption }}</figcaption>@endif
             </figure>
         @endforeach
@@ -124,7 +124,7 @@
             <a href="{{ route('textures.show', $o) }}" class="reveal card group flex items-center gap-5 p-4 hover:border-gold">
                 <img src="{{ asset($o->image) }}" alt="" width="120" height="140" loading="lazy" class="h-28 w-24 rounded-xl object-cover">
                 <span class="grid">
-                    <span class="font-display text-[1.5rem]">{{ $o->name }}</span>
+                    <span class="font-display text-[1.3rem] leading-tight sm:text-[1.5rem]">{{ $o->name }}</span>
                     <span class="text-cocoa">For {{ lcfirst($o->best_for) }}</span>
                     <span class="mt-1 font-semibold">From <x-money :amount="$o->fromPrice()"/></span>
                 </span>

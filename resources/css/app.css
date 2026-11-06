@@ -46,7 +46,7 @@
     line-height: 1.65;
     font-feature-settings: 'ss01';
   }
-  h1, h2, h3, .font-display { font-family: var(--font-display); letter-spacing: -0.01em; }
+  h1, h2, h3, .font-display { font-family: var(--font-display); letter-spacing: -0.01em; font-variant-numeric: lining-nums; }
   h1, h2, h3 { line-height: 1.08; font-weight: 600; text-wrap: balance; }
   p { text-wrap: pretty; }
   ::selection { background: var(--color-gold-light); color: var(--color-ink); }
@@ -161,7 +161,8 @@
 .nav-link[aria-current='page']::after { content: ''; position: absolute; left: .25rem; right: .25rem; bottom: .45rem; height: 2px; border-radius: 2px; background: var(--color-gold); }
 
 /* Swoosh: the gold curve along the bottom of the flyers. */
-.swoosh { display: block; width: 100%; height: auto; }
+/* A straight gold hairline that fades out at both ends: the footer's only top edge. */
+.footer-rule { position: absolute; inset: 0 0 auto; height: 1px; background: linear-gradient(90deg, transparent, var(--color-gold) 20%, var(--color-gold-light) 50%, var(--color-gold) 80%, transparent); opacity: .7; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
@@ -179,3 +180,60 @@
 .status-ready { @apply bg-emerald-100 text-emerald-900; }
 .status-completed { @apply bg-ink/10 text-ink; }
 .status-cancelled { @apply bg-mocha/10 text-mocha line-through; }
+
+
+/* ---------- First-visit splash ---------- */
+.splash { display: none; }
+html.is-splash body { overflow: hidden; }
+html.is-splash .splash {
+  position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; cursor: pointer;
+  background: radial-gradient(120% 80% at 50% 40%, #2a1910 0%, var(--color-espresso) 70%);
+  clip-path: inset(0 0 0 0);
+  animation: kq-lift .75s cubic-bezier(.76, 0, .24, 1) 1.9s forwards;
+}
+html.is-splash .splash::after { content: ''; position: absolute; inset: auto 0 0; height: 2px; background: linear-gradient(90deg, transparent, var(--color-gold-light), transparent); }
+.splash-inner { display: grid; justify-items: center; text-align: center; animation: kq-rise .75s cubic-bezier(.76, 0, .24, 1) 1.9s forwards; }
+.splash-mark { width: 128px; height: auto; overflow: visible; }
+.splash-mark text {
+  font-family: var(--font-display); font-size: 66px; font-weight: 500;
+  fill: url(#kq-gold); fill-opacity: 0; stroke: var(--color-gold-light); stroke-width: .9;
+  stroke-dasharray: 280; stroke-dashoffset: 280;
+  animation: kq-ink 1.1s var(--ease-silk) forwards, kq-fill .55s ease .7s forwards;
+}
+.splash-mark .q { animation-delay: .16s, .86s; }
+.splash-crown { fill: url(#kq-gold); opacity: 0; transform-box: fill-box; transform-origin: 50% 100%; animation: kq-crown .75s cubic-bezier(.34, 1.56, .64, 1) .8s forwards; }
+.splash-coil path { stroke: var(--color-gold-light); stroke-dasharray: 1; stroke-dashoffset: 1; animation: kq-ink 1s var(--ease-silk) .9s forwards; }
+.splash-word { margin-top: 1.1rem; color: var(--color-ivory); font-family: var(--font-display); font-size: 1.1rem; font-weight: 600; text-transform: uppercase; letter-spacing: .6em; opacity: 0; animation: kq-word 1s var(--ease-silk) .95s forwards; }
+.splash-word span { color: var(--color-gold); }
+.splash-tag { margin-top: .55rem; color: var(--color-gold-light); font-size: .64rem; font-weight: 600; text-transform: uppercase; letter-spacing: .34em; opacity: 0; animation: kq-fade .6s ease 1.25s forwards; }
+/* Content waits for the curtain, then reveals as usual. */
+html.is-splash .reveal { transition-delay: calc(var(--d, 0s) + 2s); }
+html.is-splash .coil.draw path { transition-delay: 2.1s; }
+@keyframes kq-ink { to { stroke-dashoffset: 0; } }
+@keyframes kq-fill { to { fill-opacity: 1; stroke-opacity: 0; } }
+@keyframes kq-crown { from { opacity: 0; transform: translateY(-30px) rotate(-10deg) scale(.5); } to { opacity: 1; transform: none; } }
+@keyframes kq-word { from { opacity: 0; letter-spacing: .6em; } to { opacity: 1; letter-spacing: .22em; } }
+@keyframes kq-fade { to { opacity: 1; } }
+@keyframes kq-lift { to { clip-path: inset(0 0 100% 0); visibility: hidden; } }
+@keyframes kq-rise { to { opacity: 0; transform: translateY(-40px); } }
+
+/* ---------- Page transitions (cross-document View Transitions; other browsers just navigate) ---------- */
+@view-transition { navigation: auto; }
+.site-header { view-transition-name: site-header; }
+.announce { view-transition-name: announce; }
+::view-transition-old(root) { animation: kq-page-out .26s cubic-bezier(.4, 0, 1, 1) both; }
+::view-transition-new(root) { animation: kq-page-in .5s var(--ease-silk) .06s both; }
+::view-transition-group(*) { animation-duration: .55s; animation-timing-function: var(--ease-silk); }
+::view-transition-image-pair(*) { isolation: isolate; }
+@keyframes kq-page-out { to { opacity: 0; transform: translateY(-10px); } }
+@keyframes kq-page-in { from { opacity: 0; transform: translateY(16px); } }
+
+/* Gold progress line when the next page takes a moment. */
+.nav-progress { position: fixed; inset: 0 0 auto; z-index: 90; height: 2px; transform: scaleX(0); transform-origin: left; opacity: 0; pointer-events: none; background: linear-gradient(90deg, var(--color-gold), var(--color-gold-light)); box-shadow: 0 0 10px rgb(220 185 120 / .6); view-transition-name: nav-progress; }
+html.is-loading .nav-progress { opacity: 1; animation: kq-progress 3s cubic-bezier(.08, .7, .2, 1) forwards; }
+@keyframes kq-progress { to { transform: scaleX(.9); } }
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+  html.is-loading .nav-progress { animation: none; transform: scaleX(.6); }
+}

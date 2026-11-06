@@ -4,7 +4,7 @@
 <a href="{{ route('admin.prices.index') }}" class="link inline-flex min-h-11 items-center">← Price lists</a>
 <h1 class="mt-2 text-4xl">{{ $texture->name }}</h1>
 
-<form method="POST" action="{{ route('admin.prices.update', $texture) }}" class="mt-8 grid gap-6 xl:grid-cols-[1fr_1.1fr]">
+<form method="POST" action="{{ route('admin.prices.update', $texture) }}" class="mt-8 grid gap-6 xl:grid-cols-[1fr_1.1fr] [&>*]:min-w-0">
     @csrf @method('PUT')
     <section class="card grid content-start gap-4 bg-white p-6">
         <h2 class="text-2xl">Texture details</h2>

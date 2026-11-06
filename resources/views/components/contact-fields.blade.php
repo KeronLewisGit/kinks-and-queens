@@ -1,7 +1,7 @@
-@props(['legend' => 'Your details', 'notesPlaceholder' => null])
+@props(['legend' => 'Your details', 'step' => null, 'notesPlaceholder' => null])
 {{-- Shared by the pre-order and clip-in forms. --}}
 <fieldset class="grid gap-5">
-    <legend class="mb-4 font-display text-[1.7rem]">{{ $legend ?? 'Your details' }}</legend>
+    <legend class="mb-4 flex items-baseline gap-3 font-display text-[1.7rem]">@if($step)<span class="text-gold-text">{{ $step }}</span>@endif {{ $legend }}</legend>
     <div class="grid gap-5 sm:grid-cols-2">
         <label class="field">
             <span>Your name</span>

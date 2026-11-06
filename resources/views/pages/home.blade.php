@@ -32,7 +32,7 @@
             <p class="mt-7 max-w-[52ch] text-[1.15rem] text-cocoa">
                 100% human hair in Kinky Curly, Afro Coily and Textured Straight. Bundles, ponytails and custom clip-ins, ordered for you and delivered within 14 business days.
             </p>
-            <div class="mt-9 flex flex-wrap gap-3">
+            <div class="mt-9 grid gap-3 sm:flex sm:flex-wrap">
                 <a href="{{ route('preorder') }}" class="btn btn-primary">Start a pre-order</a>
                 <a href="{{ route('match') }}" class="btn btn-ghost">Find my texture</a>
             </div>
@@ -74,11 +74,11 @@
 
 {{-- ============ PROMISE STRIP ============ --}}
 <section class="border-y border-sand/80 bg-cream/60">
-    <div class="wrap grid gap-8 py-10 sm:grid-cols-3">
+    <div class="wrap grid grid-cols-3 gap-4 py-8 sm:gap-8 sm:py-10">
         @foreach(config('kq.stats') as $i => $s)
-            <div class="reveal flex items-center gap-4" style="--d:{{ $i * .08 }}s">
-                <span class="font-display text-[2.8rem] font-semibold leading-none text-ink">{{ $s['value'] }}</span>
-                <span class="max-w-[16ch] text-[1rem] leading-snug text-cocoa">{{ $s['label'] }}</span>
+            <div class="reveal flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-4" style="--d:{{ $i * .08 }}s">
+                <span class="font-display text-[2rem] font-semibold leading-none text-ink sm:text-[2.8rem]">{{ $s['value'] }}</span>
+                <span class="max-w-[16ch] text-[.85rem] leading-snug text-cocoa sm:text-[1rem]">{{ $s['label'] }}</span>
             </div>
         @endforeach
     </div>
@@ -92,18 +92,18 @@
     </div>
     <div class="mt-14 grid gap-8 md:grid-cols-3">
         @foreach($textures as $i => $t)
-            <article class="reveal group relative" style="--d:{{ $i * .1 }}s">
+            <article class="reveal group relative flex flex-col" style="--d:{{ $i * .1 }}s">
                 <a href="{{ route('textures.show', $t) }}" class="block focus:outline-none" aria-label="{{ $t->name }}: lengths and prices">
                     <div class="frame">
-                        <img src="{{ asset($t->image) }}" alt="{{ $t->image_alt }}" width="600" height="760" loading="lazy" class="aspect-[4/5] w-full object-cover transition duration-700 group-hover:scale-[1.015]">
+                        <img src="{{ asset($t->image) }}" alt="{{ $t->image_alt }}" width="600" height="760" loading="lazy" class="aspect-[4/5] w-full object-cover transition duration-700 group-hover:scale-[1.015]" style="view-transition-name: tex-{{ $t->slug }}">
                     </div>
                 </a>
-                <div class="mt-8">
+                <div class="mt-8 flex flex-1 flex-col">
                     <p class="caps text-gold-text">{{ $t->origin }}</p>
                     <h3 class="mt-2 text-[2rem]"><a href="{{ route('textures.show', $t) }}" class="hover:text-cocoa">{{ $t->pattern }}</a></h3>
                     <x-coil :type="$t->coil" :width="180" class="mt-3"/>
                     <p class="mt-3 text-cocoa">For {{ lcfirst($t->best_for) }}. {{ $t->tagline }}</p>
-                    <p class="mt-4 flex flex-wrap items-center gap-2">
+                    <p class="mt-auto flex flex-wrap items-center gap-2 pt-4">
                         @foreach($t->formats as $f)<span class="chip">{{ \App\Models\PreOrder::FORMATS[$f] }}</span>@endforeach
                     </p>
                     <p class="mt-5 flex items-center justify-between border-t border-sand pt-4">
@@ -207,7 +207,7 @@
         </div>
         <a href="{{ route('gallery') }}" class="btn btn-ghost">See every look</a>
     </div>
-    <div class="mt-12 grid auto-rows-[180px] grid-cols-2 gap-3 sm:auto-rows-[220px] md:grid-cols-4 md:gap-4">
+    <div class="mt-12 grid grid-flow-dense auto-rows-[180px] grid-cols-2 gap-3 sm:auto-rows-[220px] md:grid-cols-4 md:gap-4">
         @foreach($photos as $i => $p)
             <figure @class(['reveal relative overflow-hidden rounded-[1.25rem]', 'row-span-2' => in_array($i, [0, 3, 5]), 'md:col-span-2' => $i === 3]) style="--d:{{ $i * .05 }}s">
                 <img src="{{ $p->url() }}" alt="{{ $p->alt }}" loading="lazy" width="600" height="760" class="h-full w-full object-cover transition duration-700 hover:scale-[1.03]">

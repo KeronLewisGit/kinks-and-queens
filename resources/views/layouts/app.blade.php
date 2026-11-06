@@ -29,6 +29,22 @@
     <meta property="og:url" content="{{ url()->current() }}">
     <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    {{-- Decide on the splash before first paint: once per session, never with reduced motion. --}}
+    <script>
+        (function () {
+            try {
+                var d = document.documentElement;
+                if (sessionStorage.getItem('kq-splash') || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+                sessionStorage.setItem('kq-splash', '1');
+                d.classList.add('is-splash');
+                var end = function () { d.classList.remove('is-splash'); };
+                setTimeout(end, 2700);
+                addEventListener('pointerdown', function skip(e) {
+                    if (e.target.closest && e.target.closest('.splash')) { end(); removeEventListener('pointerdown', skip); }
+                });
+            } catch (e) {}
+        })();
+    </script>
     @stack('head')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script type="application/ld+json">{!! json_encode([
@@ -44,7 +60,7 @@
         'sameAs' => [$ig, 'https://www.tiktok.com/@'.Setting::get('tiktok_handle')],
     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
 </head>
-<body class="min-h-screen pb-20 sm:pb-0" x-data="{ menu: false }" @keydown.escape.window="menu = false">
+<body class="min-h-screen" x-data="{ menu: false }" @keydown.escape.window="menu = false">
     <svg width="0" height="0" class="absolute" aria-hidden="true" focusable="false">
         <defs>
             <linearGradient id="kq-gold" x1="0" y1="0" x2="1" y2="1">
@@ -52,10 +68,11 @@
             </linearGradient>
         </defs>
     </svg>
+    @include('partials.splash')
     <a href="#main" class="fixed left-4 top-3 z-[60] -translate-y-24 rounded-full bg-ink px-5 py-3 font-semibold text-ivory focus:translate-y-0">Skip to content</a>
 
     @if($note = Setting::get('announcement'))
-        <p class="bg-espresso px-4 py-2 text-center text-[.85rem] font-medium text-gold-light">
+        <p class="announce bg-espresso px-4 py-2 text-center text-[.85rem] font-medium text-gold-light">
             <x-crown class="mr-1.5 -mt-0.5 text-gold"/>{{ $note }}
         </p>
     @endif
@@ -105,14 +122,14 @@
         </div>
     </div>
 
-    <main id="main" tabindex="-1" class="outline-none">
+    <main id="main" tabindex="-1" @class(['outline-none', 'pb-24' => ! ($flushFooter ?? false)])>
         @yield('content')
     </main>
 
-    <footer class="relative mt-24 overflow-hidden bg-espresso text-ivory/85">
-        <svg class="swoosh text-gold" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0 60V22C380 70 760 -10 1440 26V60Z" fill="var(--color-ivory)"/><path d="M0 22C380 70 760 -10 1440 26" fill="none" stroke="url(#kq-gold)" stroke-width="2.5"/></svg>
-        <div aria-hidden="true" class="watermark absolute -bottom-16 right-0 text-[18rem] opacity-60">KQ</div>
-        <div class="wrap relative grid gap-12 pb-12 pt-10 lg:grid-cols-[1.3fr_1fr_1fr_1fr]">
+    <footer class="relative bg-espresso text-ivory/85">
+        <div class="footer-rule" aria-hidden="true"></div>
+        <div class="absolute inset-0 overflow-hidden" aria-hidden="true"><div class="watermark absolute -bottom-16 right-0 text-[18rem] opacity-60">KQ</div></div>
+        <div class="wrap relative grid gap-12 pb-12 pt-16 lg:grid-cols-[1.3fr_1fr_1fr_1fr] lg:pt-20">
             <div>
                 <x-logo dark/>
                 <p class="mt-8 font-display text-[2rem] italic leading-tight text-ivory">More than hair,<br><span class="script not-italic text-[1.6em] text-gold-light">it’s confidence.</span></p>
@@ -144,12 +161,12 @@
                     @if($wa = Setting::whatsappLink())
                         <li><a class="inline-flex min-h-11 items-center hover:text-gold-light" href="{{ $wa }}" rel="noopener">WhatsApp</a></li>
                     @endif
-                    <li><a class="inline-flex min-h-11 items-center hover:text-gold-light" href="{{ $ig }}" rel="noopener">@{{ Setting::get('instagram_handle') }}</a></li>
-                    <li><a class="inline-flex min-h-11 items-center hover:text-gold-light" href="https://www.tiktok.com/@{{ Setting::get('tiktok_handle') }}" rel="noopener">TikTok</a></li>
+                    <li><a class="inline-flex min-h-11 items-center hover:text-gold-light" href="{{ $ig }}" rel="noopener">{{ '@'.Setting::get('instagram_handle') }}</a></li>
+                    <li><a class="inline-flex min-h-11 items-center hover:text-gold-light" href="{{ 'https://www.tiktok.com/@'.Setting::get('tiktok_handle') }}" rel="noopener">TikTok</a></li>
                 </ul>
             </div>
         </div>
-        <div class="wrap relative flex flex-col gap-3 border-t border-ivory/10 py-6 text-[.88rem] text-ivory/65 sm:flex-row sm:items-center sm:justify-between">
+        <div class="wrap relative flex flex-col gap-3 border-t border-ivory/10 pb-24 pt-6 text-[.88rem] sm:pb-6 text-ivory/65 sm:flex-row sm:items-center sm:justify-between">
             <p>© {{ date('Y') }} Kinks &amp; Queens. Pre-order only. Prices in Trinidad &amp; Tobago dollars.</p>
             <p class="flex flex-wrap gap-x-5 gap-y-1">
                 @if($fn = Setting::get('footer_note'))<span class="text-gold-light">{{ $fn }}</span>@endif

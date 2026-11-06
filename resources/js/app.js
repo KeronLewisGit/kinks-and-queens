@@ -24,6 +24,28 @@ function reveal() {
     els.forEach((el) => io.observe(el));
 }
 
+/* Thin gold line at the top when a page or form takes more than a beat to answer. */
+function navProgress() {
+    const bar = document.createElement('div');
+    bar.className = 'nav-progress';
+    bar.setAttribute('aria-hidden', 'true');
+    document.body.append(bar);
+    const root = document.documentElement;
+    let timer;
+    const start = () => { clearTimeout(timer); timer = setTimeout(() => root.classList.add('is-loading'), 140); };
+    const stop = () => { clearTimeout(timer); root.classList.remove('is-loading'); };
+    document.addEventListener('click', (e) => {
+        const a = e.target.closest('a[href]');
+        if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        if (a.target === '_blank' || a.hasAttribute('download')) return;
+        const url = new URL(a.href, location.href);
+        if (url.origin !== location.origin || (url.pathname === location.pathname && url.search === location.search)) return;
+        start();
+    });
+    document.addEventListener('submit', (e) => { if (!e.defaultPrevented) start(); });
+    window.addEventListener('pageshow', stop);
+}
+
 /* Header picks up a background once the page scrolls. */
 function stickyHeader() {
     const header = document.querySelector('.site-header');
@@ -179,3 +201,4 @@ Alpine.start();
 
 reveal();
 stickyHeader();
+navProgress();

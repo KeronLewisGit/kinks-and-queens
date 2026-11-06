@@ -14,6 +14,8 @@ const problems = [];
 for (const [vw, vh, tag] of widths) {
   const page = await browser.newPage();
   await page.setViewport({ width: vw, height: vh, deviceScaleFactor: 1 });
+  // Skip the once-per-session splash so it never covers a screenshot.
+  await page.evaluateOnNewDocument(() => sessionStorage.setItem('kq-splash', '1'));
   for (const url of [...pub, 'LOGIN', ...adm]) {
     if (url === 'LOGIN') {
       if (!adm.length) continue;

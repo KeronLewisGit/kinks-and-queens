@@ -71,6 +71,14 @@ class PublicSiteTest extends TestCase
         }
     }
 
+    public function test_footer_social_links_render_handles_not_template_code(): void
+    {
+        $this->get('/')
+            ->assertSee('>@kinksandqueens</a>', false)
+            ->assertSee('href="https://www.tiktok.com/@kinksandqueens"', false)
+            ->assertDontSee('Setting::get', false);
+    }
+
     public function test_security_headers_and_noindex_on_private_pages(): void
     {
         $this->get('/')->assertHeader('X-Content-Type-Options', 'nosniff')->assertHeaderMissing('X-Robots-Tag');

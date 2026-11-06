@@ -1,4 +1,4 @@
-@extends('layouts.app', ['title' => 'Custom clip-ins from your bundles', 'description' => 'Bring your own bundles and Kinks & Queens will machine-sew them into a custom clip-in set of about 10–13 pieces.'])
+@extends('layouts.app', ['flushFooter' => true, 'title' => 'Custom clip-ins from your bundles', 'description' => 'Bring your own bundles and Kinks & Queens will machine-sew them into a custom clip-in set of about 10–13 pieces.'])
 
 @section('content')
 <x-page-hero title="Custom clip-ins" script="repurpose your bundles" lead="Sometimes you don’t want a sew-in or a wig. Sometimes you want something quick, easy, versatile and removable." image="assets/img/clip-ins-afro-coily.webp" alt="Custom clip-in set sewn from Mongolian Afro Coily bundles" coil="coil">
@@ -69,7 +69,7 @@
                 </div>
                 <div>
                     <p class="label">Your own hair</p>
-                    <div class="mt-2 grid gap-2 sm:grid-cols-4">
+                    <div class="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
                         @foreach(['Natural', 'Relaxed', 'Silk-pressed', 'Not sure'] as $h)
                             <label class="tile"><input type="radio" name="own_hair" value="{{ $h }}" @checked(old('own_hair') === $h)><span class="font-semibold">{{ $h }}</span></label>
                         @endforeach

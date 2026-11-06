@@ -1,4 +1,4 @@
-@extends('layouts.app', ['title' => 'Care guide', 'description' => 'How to keep Kinks & Queens textured extensions soft, defined and in rotation for years.'])
+@extends('layouts.app', ['flushFooter' => true, 'title' => 'Care guide', 'description' => 'How to keep Kinks & Queens textured extensions soft, defined and in rotation for years.'])
 
 @section('content')
 <x-page-hero title="Care guide" script="low effort, long life" lead="Good textured hair shouldn’t only look good on install day. With the right care, it’s something you can reach for again and again." image="assets/img/kinky-curly-closeup.webp" alt="Close-up of defined Brazilian Kinky Curly curls" coil="curl"/>
@@ -12,8 +12,8 @@
     <ol class="mt-12 grid gap-5 md:grid-cols-4">
         @foreach($care as $i => $c)
             <li class="reveal card relative overflow-hidden p-6" style="--d:{{ $i * .08 }}s">
-                <span aria-hidden="true" class="watermark absolute -right-2 -top-6 text-[7rem]">{{ $i + 1 }}</span>
-                <h3 class="relative text-[1.5rem]">{{ $c['title'] }}</h3>
+                <span class="flex size-12 items-center justify-center rounded-full bg-ink font-display text-[1.3rem] text-gold-light"><span class="sr-only">Step </span>{{ $i + 1 }}</span>
+                <h3 class="relative mt-5 text-[1.5rem]">{{ $c['title'] }}</h3>
                 <p class="relative mt-3 text-cocoa">{{ $c['body'] }}</p>
             </li>
         @endforeach

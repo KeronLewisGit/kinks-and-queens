@@ -21,8 +21,8 @@
     <div class="grid gap-5 sm:grid-cols-3">
         @foreach($textures as $t)
             <a href="{{ route('textures.show', $t) }}" class="reveal card p-6 hover:border-gold">
-                <x-coil :type="$t->coil" :width="160"/>
-                <p class="mt-4 font-display text-[1.6rem]">{{ $t->pattern }}</p>
+                <span class="flex h-9 items-center"><x-coil :type="$t->coil" :width="160"/></span>
+                <p class="mt-3 font-display text-[1.6rem]">{{ $t->pattern }}</p>
                 <p class="text-cocoa">For {{ lcfirst($t->best_for) }}</p>
             </a>
         @endforeach

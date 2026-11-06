@@ -25,11 +25,11 @@
                 <legend class="mb-4 flex items-baseline gap-3 font-display text-[1.7rem]"><span class="text-gold-text">1</span> Texture</legend>
                 <div class="grid gap-3 sm:grid-cols-3">
                     @foreach($textures as $t)
-                        <label class="tile !items-start !p-3 flex-col">
+                        <label class="tile !grid grid-cols-[4.5rem_1fr] !items-center gap-x-4 !p-3 sm:!flex sm:flex-col sm:!items-start">
                             <input type="radio" name="texture_id" value="{{ $t->id }}" x-model.number="texture" @checked((int) $prefill['texture'] === $t->id) required>
-                            <img src="{{ asset($t->image) }}" alt="" width="300" height="200" loading="lazy" class="aspect-[3/2] w-full rounded-xl object-cover">
-                            <span class="mt-1 font-semibold leading-snug">{{ $t->name }}</span>
-                            <span class="tile-sub">For {{ lcfirst($t->best_for) }}</span>
+                            <img src="{{ asset($t->image) }}" alt="" width="300" height="200" loading="lazy" class="row-span-2 aspect-square w-full rounded-xl object-cover sm:aspect-[3/2]">
+                            <span class="self-end font-semibold leading-snug sm:mt-1">{{ $t->name }}</span>
+                            <span class="tile-sub self-start">For {{ lcfirst($t->best_for) }}</span>
                         </label>
                     @endforeach
                 </div>
@@ -111,9 +111,22 @@
                 <p class="hint mt-3" x-show="!format">Choose how you’ll wear it first.</p>
             </fieldset>
 
-            <x-contact-fields legend="4  Your details"/>
+            <x-contact-fields step="4" legend="Your details"/>
 
             <div class="lg:hidden">
+                {{-- Phone: the same summary as the desktop sidebar, right above the button. --}}
+                <div class="mb-4 rounded-2xl bg-espresso p-5 text-ivory" x-show="summary" x-cloak aria-live="polite">
+                    <p class="caps text-gold-light">Your request</p>
+                    <template x-if="summary">
+                        <div class="mt-2 flex items-end justify-between gap-4">
+                            <div class="min-w-0">
+                                <p class="font-display text-[1.3rem] leading-tight" x-text="summary.name"></p>
+                                <p class="mt-1 text-[.95rem] text-ivory/80" x-text="[summary.format, summary.detail].filter(Boolean).join(' · ')"></p>
+                            </div>
+                            <p class="shrink-0 font-display text-[1.5rem] text-gold-light" x-text="summary.price"></p>
+                        </div>
+                    </template>
+                </div>
                 <button class="btn btn-primary w-full" type="submit">Send my pre-order request</button>
                 <p class="hint mt-3 text-center">Nothing to pay now. We confirm with you first.</p>
             </div>

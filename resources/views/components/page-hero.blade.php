@@ -1,4 +1,4 @@
-@props(['title', 'current' => null, 'script' => null, 'lead' => null, 'image' => null, 'alt' => '', 'crumb' => null, 'coil' => 'curl'])
+@props(['title', 'current' => null, 'script' => null, 'lead' => null, 'image' => null, 'alt' => '', 'crumb' => null, 'coil' => 'curl', 'morph' => null])
 {{-- The one inner-page hero used by every page except the home page. --}}
 <section class="relative overflow-hidden border-b border-sand/70 bg-cream/60">
     <div aria-hidden="true" class="watermark absolute -right-6 -top-10 hidden text-[22rem] lg:block">KQ</div>
@@ -18,12 +18,12 @@
             </h1>
             <x-coil :type="$coil" :width="200" class="mt-6"/>
             @if($lead)<p class="mt-6 max-w-[56ch] text-[1.15rem] text-cocoa">{{ $lead }}</p>@endif
-            @if(trim($slot))<div class="mt-8 flex flex-wrap gap-3">{{ $slot }}</div>@endif
+            @if(trim($slot))<div class="mt-8 grid gap-3 sm:flex sm:flex-wrap">{{ $slot }}</div>@endif
         </div>
         @if($image)
-            <div class="reveal mx-auto w-full max-w-[360px] lg:max-w-none" style="--d:.12s">
+            <div class="reveal mx-auto w-full max-w-[520px] lg:max-w-none" style="--d:.12s">
                 <div class="frame">
-                    <img src="{{ asset($image) }}" alt="{{ $alt }}" width="720" height="860" class="aspect-[5/6] w-full object-cover" fetchpriority="high">
+                    <img src="{{ asset($image) }}" alt="{{ $alt }}" width="720" height="860" class="aspect-[4/3] w-full object-cover object-[50%_28%] lg:aspect-[5/6]" fetchpriority="high" @if($morph) style="view-transition-name: {{ $morph }}" @endif>
                 </div>
             </div>
         @endif
