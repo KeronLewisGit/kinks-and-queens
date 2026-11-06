@@ -1,0 +1,181 @@
+@import '@fontsource-variable/playfair-display/wght.css';
+@import '@fontsource-variable/playfair-display/wght-italic.css';
+@import '@fontsource-variable/albert-sans/wght.css';
+@import '@fontsource/allura/latin-400.css';
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+/*
+| Kinks & Queens: chocolate, ivory and gold, taken from the brand's own flyers.
+| Text colours are checked for AA on the surfaces they sit on:
+|   ink #2b1a11 on ivory 15.0:1 · cocoa #5b3a27 on ivory 9.1:1 · mocha #6f5141 on ivory 6.4:1
+|   gold-text #845d1d on ivory 5.3:1 · gold-light #dcb978 on espresso 9.8:1 · plain gold is decoration only
+*/
+@theme {
+  --font-display: 'Playfair Display Variable', 'Playfair Display', Georgia, serif;
+  --font-sans: 'Albert Sans Variable', 'Albert Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-script: 'Allura', 'Snell Roundhand', cursive;
+
+  --color-ivory: #f8f2e9;
+  --color-cream: #f0e5d5;
+  --color-sand: #e4d2bb;
+  --color-ink: #2b1a11;
+  --color-cocoa: #5b3a27;
+  --color-mocha: #6f5141;
+  --color-gold: #b58a3c;
+  --color-gold-text: #845d1d;
+  --color-gold-light: #dcb978;
+  --color-espresso: #1e120c;
+  --color-espresso-2: #2c1b12;
+  --color-rose: #a4473a;
+
+  --radius-frame: 1.75rem;
+  --ease-silk: cubic-bezier(.22, .8, .24, 1);
+}
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    @apply bg-ivory text-ink font-sans antialiased;
+    font-size: 1.0625rem; /* 17px */
+    line-height: 1.65;
+    font-feature-settings: 'ss01';
+  }
+  h1, h2, h3, .font-display { font-family: var(--font-display); letter-spacing: -0.01em; }
+  h1, h2, h3 { line-height: 1.08; font-weight: 600; text-wrap: balance; }
+  p { text-wrap: pretty; }
+  ::selection { background: var(--color-gold-light); color: var(--color-ink); }
+  :focus-visible { outline: 3px solid var(--color-gold); outline-offset: 3px; border-radius: 6px; }
+  [x-cloak] { display: none !important; }
+  img { max-width: 100%; height: auto; }
+}
+
+@layer components {
+  .wrap { @apply mx-auto w-full max-w-[1240px] px-5 sm:px-8; }
+  .prose-kq { max-width: 65ch; }
+  .prose-kq p + p { margin-top: 1em; }
+
+  /* The wide-tracked capitals from the flyers ("WHERE TEXTURE REIGNS"). */
+  .caps { @apply uppercase; letter-spacing: .28em; font-size: .78rem; font-weight: 600; }
+  .script { font-family: var(--font-script); font-weight: 400; letter-spacing: 0; line-height: .9; }
+
+  /* Crown rule: the gold hairline with a small crown that sits under the logo on every flyer. */
+  .crown-rule { @apply flex items-center gap-3 text-gold; }
+  .crown-rule::before, .crown-rule::after { content: ''; height: 1px; flex: 1; background: linear-gradient(90deg, transparent, currentColor 30%, currentColor 70%, transparent); }
+  .crown-rule.left::before { flex: 0 0 0; }
+  .crown-rule.left { justify-content: flex-start; }
+
+  .btn { @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 py-3 text-[1rem] font-semibold transition; transition-timing-function: var(--ease-silk); }
+  .btn-primary { @apply bg-ink text-ivory hover:bg-cocoa; box-shadow: 0 10px 30px -14px rgb(43 26 17 / .7); }
+  .btn-gold { color: var(--color-espresso); background: linear-gradient(135deg, #ecd39a, #c99a4a 55%, #a87a2f); box-shadow: 0 12px 30px -14px rgb(181 138 60 / .9); }
+  .btn-gold:hover { filter: brightness(1.06); }
+  .btn-ghost { @apply border border-ink/25 text-ink hover:border-ink hover:bg-ink hover:text-ivory; }
+  .btn-ghost-light { @apply border border-ivory/35 text-ivory hover:bg-ivory hover:text-ink; }
+  .link { @apply font-semibold text-gold-text underline decoration-gold/40 decoration-2 underline-offset-4 hover:decoration-gold-text; }
+
+  /* Photo frame with a gold offset line, echoing the rounded cards on the price lists. */
+  .frame { position: relative; border-radius: var(--radius-frame); }
+  .frame > img, .frame > .frame-media { border-radius: var(--radius-frame); }
+  .frame::after { content: ''; position: absolute; inset: 0; border: 1.5px solid var(--color-gold); border-radius: var(--radius-frame); transform: translate(14px, 14px); z-index: -1; pointer-events: none; }
+
+  .card { @apply rounded-[1.5rem] border border-sand bg-white/60; }
+
+  .field { @apply grid gap-1.5; }
+  .field > span:first-child, .label { @apply text-[.95rem] font-semibold text-ink; }
+  .input { @apply min-h-12 w-full rounded-xl border border-sand bg-white px-4 py-3 text-[1rem] text-ink placeholder:text-mocha/70; transition: border-color .2s, box-shadow .2s; }
+  .input:focus { @apply border-gold outline-none; box-shadow: 0 0 0 4px rgb(181 138 60 / .2); }
+  .input[aria-invalid='true'] { @apply border-rose; }
+  .err { @apply text-[.92rem] font-medium text-rose; }
+  .hint { @apply text-[.92rem] text-mocha; }
+
+  /* Selectable tiles (radio inputs) used by the pre-order builder, clip-ins form and quiz. */
+  .tile { @apply relative flex min-h-14 cursor-pointer items-center gap-3 rounded-2xl border border-sand bg-white/70 px-4 py-3 transition; }
+  .tile:hover { @apply border-gold/70; }
+  .tile:has(input:checked) { @apply border-ink bg-ink text-ivory; }
+  .tile:has(input:checked) .tile-sub { @apply text-gold-light; }
+  .tile:has(input:focus-visible) { outline: 3px solid var(--color-gold); outline-offset: 3px; }
+  .tile:has(input:disabled) { @apply cursor-not-allowed opacity-45; }
+  .tile input { @apply absolute opacity-0; }
+  .tile-sub { @apply text-[.9rem] text-mocha; }
+
+  .chip { @apply inline-flex items-center gap-1.5 rounded-full border border-sand bg-white/70 px-3 py-1 text-[.85rem] font-semibold text-cocoa; }
+
+  .watermark { font-family: var(--font-display); font-weight: 500; line-height: .8; color: transparent; -webkit-text-stroke: 1.5px rgb(181 138 60 / .22); user-select: none; pointer-events: none; }
+}
+
+/* ---------- Coil lines: each texture's curl pattern drawn in gold ---------- */
+.coil path { fill: none; stroke: url(#kq-gold); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.coil.on-dark path { stroke: var(--color-gold-light); }
+.js .coil.draw path { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1.8s var(--ease-silk); }
+.js .coil.draw.is-in path, .js .is-in .coil.draw path { stroke-dashoffset: 0; }
+
+/* ---------- Scroll reveal (content is always visible without JS or with reduced motion) ---------- */
+.js .reveal { opacity: 0; transform: translateY(22px); transition: opacity .9s var(--ease-silk), transform .9s var(--ease-silk); transition-delay: var(--d, 0s); }
+.js .reveal.is-in { opacity: 1; transform: none; }
+
+/* ---------- Hero texture switcher ---------- */
+.stage { position: relative; aspect-ratio: 4 / 5; }
+.stage img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-frame); transition: opacity .7s var(--ease-silk), transform 1.2s var(--ease-silk); }
+.stage img[data-off] { opacity: 0; transform: scale(1.04); }
+.swatch { @apply flex min-h-14 w-full flex-col items-center gap-2 rounded-2xl border border-sand bg-white/70 p-2 text-center text-[.9rem] leading-tight transition sm:flex-row sm:gap-3 sm:rounded-full sm:p-1.5 sm:pr-4 sm:text-left sm:text-[1rem]; }
+.swatch img { @apply size-12 shrink-0 rounded-full object-cover sm:size-11; }
+.swatch[aria-pressed='true'] { @apply border-ink bg-ink text-ivory; }
+.swatch[aria-pressed='true'] .tile-sub { @apply text-gold-light; }
+
+/* ---------- Length ruler ---------- */
+.ruler-tick { @apply absolute left-0 right-0 flex items-center gap-2 text-[.8rem] font-semibold text-mocha; transform: translateY(-50%); }
+.ruler-tick::before { content: ''; width: 14px; height: 1px; background: currentColor; }
+.ruler-hair { transition: height .6s var(--ease-silk); }
+.ruler-marker { transition: top .6s var(--ease-silk); }
+
+/* ---------- Diary track ---------- */
+.track { display: grid; grid-auto-flow: column; grid-auto-columns: min(82vw, 340px); gap: 1.25rem; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: thin; padding-bottom: 1rem; }
+.track > * { scroll-snap-align: start; }
+@media (min-width: 1024px) { .track { grid-auto-columns: calc((100% - 4 * 1.25rem) / 5); overflow: visible; } }
+
+/* ---------- Queen Cam mosaic ---------- */
+.mosaic { columns: 2; column-gap: .9rem; }
+@media (min-width: 768px) { .mosaic { columns: 3; column-gap: 1.1rem; } }
+@media (min-width: 1100px) { .mosaic.wide { columns: 4; } }
+.mosaic > * { break-inside: avoid; margin-bottom: .9rem; }
+
+/* ---------- Order timeline ---------- */
+.timeline li { position: relative; padding-left: 2.25rem; }
+.timeline li::before { content: ''; position: absolute; left: .6rem; top: 1.6rem; bottom: -1.1rem; width: 2px; background: var(--color-sand); }
+.timeline li:last-child::before { display: none; }
+.timeline .dot { position: absolute; left: 0; top: .2rem; width: 1.3rem; height: 1.3rem; border-radius: 99px; border: 2px solid var(--color-sand); background: var(--color-ivory); }
+.timeline li.done .dot { background: var(--color-gold); border-color: var(--color-gold); }
+.timeline li.done::before { background: var(--color-gold); }
+.timeline li.current .dot { background: var(--color-ink); border-color: var(--color-ink); box-shadow: 0 0 0 5px rgb(181 138 60 / .35); }
+
+/* ---------- Header ---------- */
+.site-header { transition: background-color .3s, box-shadow .3s, border-color .3s; }
+.site-header.is-stuck { background: rgb(248 242 233 / .92); backdrop-filter: blur(12px); box-shadow: 0 10px 30px -24px rgb(43 26 17 / .6); }
+.nav-link { @apply relative inline-flex min-h-11 items-center px-1 text-[.98rem] font-medium text-ink/85 hover:text-ink; }
+.nav-link[aria-current='page'] { @apply text-ink; }
+.nav-link[aria-current='page']::after { content: ''; position: absolute; left: .25rem; right: .25rem; bottom: .45rem; height: 2px; border-radius: 2px; background: var(--color-gold); }
+
+/* Swoosh: the gold curve along the bottom of the flyers. */
+.swoosh { display: block; width: 100%; height: auto; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+/* ---------- Admin ---------- */
+.adm-table { @apply w-full text-left text-[.95rem]; }
+.adm-table th { @apply border-b border-sand px-3 py-2 text-[.8rem] font-semibold uppercase tracking-wider text-mocha; }
+.adm-table td { @apply border-b border-sand/70 px-3 py-3 align-top; }
+.status { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-[.8rem] font-semibold; }
+.status-new { @apply bg-rose/10 text-rose; }
+.status-confirmed { @apply bg-gold/15 text-gold-text; }
+.status-paid { @apply bg-gold/25 text-gold-text; }
+.status-ordered { @apply bg-cocoa/10 text-cocoa; }
+.status-ready { @apply bg-emerald-100 text-emerald-900; }
+.status-completed { @apply bg-ink/10 text-ink; }
+.status-cancelled { @apply bg-mocha/10 text-mocha line-through; }

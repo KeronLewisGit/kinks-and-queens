@@ -1,0 +1,12 @@
+# Uploaded photos only: nothing in here may run as code.
+Options -Indexes -ExecCGI
+RemoveHandler .php .phtml .phar .pl .py .cgi .sh
+RemoveType .php .phtml .phar
+<FilesMatch "\.(php\d?|phtml|phar|pl|py|cgi|sh|html?|svg)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+</FilesMatch>
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
