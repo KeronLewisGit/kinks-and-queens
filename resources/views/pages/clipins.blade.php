@@ -29,10 +29,12 @@
     </div>
 </section>
 
-<section id="request" class="scroll-mt-28 bg-cream/50 py-20">
-    <div class="wrap max-w-[820px]">
+<section id="request" class="scroll-mt-28 bg-cream/50 py-20 lg:py-24">
+    {{-- Same two-column grid as the pre-order page: form left, sticky guide right. --}}
+    <div class="wrap grid gap-12 lg:grid-cols-[1fr_360px] lg:gap-14">
+    <div class="min-w-0">
         <h2 class="text-4xl sm:text-5xl">Request a clip-in set</h2>
-        <p class="mt-3 text-cocoa">Tell us about the bundles you have. We’ll message you with a quote and drop-off details.</p>
+        <p class="mt-3 max-w-[60ch] text-cocoa">Tell us about the bundles you have. We’ll message you with a quote and drop-off details.</p>
         <form method="POST" action="{{ route('clipins.store') }}" class="mt-10 grid gap-10" novalidate>
             @csrf
             @if($errors->any())<div class="rounded-2xl border border-rose/40 bg-rose/5 p-5 font-semibold text-rose" role="alert">Please check the highlighted fields.</div>@endif
@@ -77,8 +79,44 @@
                 </div>
             </fieldset>
             <x-contact-fields notes-placeholder="The styles you want to wear, when you need the set…"/>
-            <button class="btn btn-primary justify-self-start">Send clip-in request</button>
+            <div class="grid gap-3 sm:flex sm:items-center sm:gap-5">
+                <button class="btn btn-primary">Send clip-in request</button>
+                <p class="hint">Nothing to pay now. We quote first.</p>
+            </div>
         </form>
+    </div>
+
+    <aside aria-labelledby="clip-next-h">
+        <div class="sticky top-28 overflow-hidden rounded-[1.75rem] bg-espresso text-ivory">
+            <div class="relative h-44 overflow-hidden">
+                <img src="{{ asset('assets/img/clip-ins-afro-coily.webp') }}" alt="Afro Coily wefts sewn into a clip-in set" width="720" height="440" loading="lazy" class="h-full w-full object-cover opacity-85">
+                <div class="absolute inset-0 bg-gradient-to-t from-espresso to-transparent"></div>
+                <span class="absolute bottom-3 left-6 rounded-full bg-espresso/80 px-3 py-1 text-[.8rem] font-semibold text-gold-light backdrop-blur">Made from a client’s own bundles</span>
+            </div>
+            <div class="p-6">
+                <p id="clip-next-h" class="caps text-gold-light">What happens next</p>
+                <ol class="mt-5 grid gap-5">
+                    @foreach([
+                        ['We quote', 'We message you with a price for the set, based on your hair and the fullness you want.'],
+                        ['You drop off', 'Bring your bundles to us. We confirm where when we reply.'],
+                        ['We sew', 'About 10–13 machine-sewn pieces. We message you when your set is ready.'],
+                    ] as $i => [$title, $body])
+                        <li class="grid grid-cols-[2.25rem_1fr] gap-3">
+                            <span class="flex size-9 items-center justify-center rounded-full border border-gold/50 font-display text-gold-light">{{ $i + 1 }}</span>
+                            <span>
+                                <span class="block font-display text-[1.2rem] leading-tight">{{ $title }}</span>
+                                <span class="mt-1 block text-[.95rem] text-ivory/75">{{ $body }}</span>
+                            </span>
+                        </li>
+                    @endforeach
+                </ol>
+                <div class="mt-6 border-t border-ivory/15 pt-5">
+                    <p class="text-[.95rem] text-ivory/75">Want to ask something first?</p>
+                    <a href="{{ \App\Models\Setting::instagramDm() }}" class="btn btn-ghost-light mt-3 w-full" rel="noopener">DM us on Instagram</a>
+                </div>
+            </div>
+        </div>
+    </aside>
     </div>
 </section>
 @endsection
