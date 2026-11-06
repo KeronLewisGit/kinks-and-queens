@@ -1,0 +1,5 @@
+@extends('errors.layout')
+@section('title', 'Back soon')
+@section('code', 'Back soon')
+@section('heading', 'We’re making a few updates.')
+@section('message', 'The site will be back in a few minutes. Thank you for your patience, queen.')

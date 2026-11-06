@@ -36,7 +36,6 @@ mkdir -p "$STAGE/uploads" && cp "$ROOT/public/uploads/.htaccess" "$STAGE/uploads
 cp "$ROOT/public/favicon.svg" "$STAGE/favicon.svg"
 cp "$ROOT/deploy/index.php" "$STAGE/index.php"
 cp "$ROOT/deploy/.htaccess" "$STAGE/.htaccess"
-cp "$ROOT/deploy/robots.txt" "$STAGE/robots.txt"
 cp "$ROOT/deploy/setup.php" "$STAGE/setup.php"
 
 echo "→ Zipping"

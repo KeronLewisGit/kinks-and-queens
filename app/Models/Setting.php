@@ -21,7 +21,6 @@ class Setting extends Model
         'tiktok_handle' => 'kinksandqueens',
         'whatsapp_number' => '',
         'notify_email' => '',
-        'lead_time' => '14 business days or less',
         'announcement' => 'Pre-order only · We do not carry ready stock · Orders arrive within 14 business days or less',
         'footer_note' => 'Jesus is Lord.',
         'accepting_orders' => '1',
@@ -30,8 +29,12 @@ class Setting extends Model
     public static function get(string $key, ?string $default = null): ?string
     {
         $all = static::all_cached();
+        if (array_key_exists($key, $all)) {
+            // A saved value wins, including one the owner deliberately cleared.
+            return $all[$key] ?? $default;
+        }
 
-        return $all[$key] ?? $default ?? (self::DEFAULTS[$key] ?? null);
+        return $default ?? (self::DEFAULTS[$key] ?? null);
     }
 
     /** @return array<string, string|null> */
@@ -81,5 +84,12 @@ class Setting extends Model
     public static function instagramUrl(): string
     {
         return 'https://www.instagram.com/'.static::get('instagram_handle').'/';
+    }
+
+    public static function tiktokUrl(): ?string
+    {
+        $handle = static::get('tiktok_handle');
+
+        return $handle ? 'https://www.tiktok.com/@'.$handle : null;
     }
 }

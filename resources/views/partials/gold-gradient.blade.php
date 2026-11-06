@@ -1,0 +1,2 @@
+{{-- The gold gradient the logo and crown marks paint with. Include once per page, right after <body>. --}}
+<svg width="0" height="0" class="absolute" aria-hidden="true" focusable="false"><defs><linearGradient id="kq-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e6c77f"/><stop offset=".55" stop-color="#b58a3c"/><stop offset="1" stop-color="#8c6421"/></linearGradient></defs></svg>

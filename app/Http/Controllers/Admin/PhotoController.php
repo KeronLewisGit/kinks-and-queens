@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\GalleryPhoto;
 use App\Models\Texture;
+use App\Support\GalleryImage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Throwable;
 
 class PhotoController extends Controller
 {
@@ -34,8 +36,11 @@ class PhotoController extends Controller
             'texture_id' => ['nullable', 'exists:textures,id'],
         ], ['alt.required' => 'Describe the photo for people using screen readers, for example “Afro Coily ponytail, side view”.']);
 
-        $file = $request->file('photo');
-        $path = $file->storeAs('gallery', Str::uuid().'.'.$file->extension(), 'public');
+        try {
+            $path = GalleryImage::store($request->file('photo'));
+        } catch (Throwable) {
+            return back()->withInput()->withErrors(['photo' => 'We could not read that photo. Try saving it as a JPG and upload it again.']);
+        }
 
         GalleryPhoto::create([
             'path' => $path, 'alt' => $data['alt'], 'caption' => $data['caption'] ?? null, 'label' => $data['label'] ?? null,

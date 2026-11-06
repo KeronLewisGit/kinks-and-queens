@@ -6,6 +6,7 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\PreOrderController;
 use App\Http\Controllers\TextureController;
 use App\Http\Controllers\TrackController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PageController::class, 'home'])->name('home');
@@ -22,13 +23,16 @@ Route::get('/privacy', [PageController::class, 'privacy'])->name('privacy');
 
 Route::get('/pre-order', [PreOrderController::class, 'create'])->name('preorder');
 Route::post('/pre-order', [PreOrderController::class, 'store'])->middleware('throttle:requests')->name('preorder.store');
-Route::get('/pre-order/sent/{preOrder}', [PreOrderController::class, 'sent'])->name('preorder.sent');
+Route::get('/pre-order/sent/{preOrder}', [PreOrderController::class, 'sent'])->name('preorder.sent')
+    ->missing(fn () => redirect()->route('track')->with('notice', 'Enter your reference and phone number to see that request.'));
 
 Route::get('/track', [TrackController::class, 'form'])->name('track');
 Route::post('/track', [TrackController::class, 'lookup'])->middleware('throttle:tracking')->name('track.lookup');
-Route::get('/track/{preOrder}', [TrackController::class, 'show'])->name('track.show');
+Route::get('/track/{preOrder}', [TrackController::class, 'show'])->name('track.show')
+    ->missing(fn (Request $request) => redirect()->route('track')->withInput(['reference' => strtoupper((string) $request->route('preOrder'))]));
 
 Route::get('/sitemap.xml', [PageController::class, 'sitemap'])->name('sitemap');
+Route::get('/robots.txt', [PageController::class, 'robots'])->name('robots');
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/login', [Admin\AuthController::class, 'form'])->middleware('guest')->name('login');

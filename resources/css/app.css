@@ -32,6 +32,7 @@
   --color-espresso: #1e120c;
   --color-espresso-2: #2c1b12;
   --color-rose: #a4473a;
+  --color-line: #9c8673; /* form control borders: 3.5:1 on white */
 
   --radius-frame: 1.75rem;
   --ease-silk: cubic-bezier(.22, .8, .24, 1);
@@ -50,7 +51,9 @@
   h1, h2, h3 { line-height: 1.08; font-weight: 600; text-wrap: balance; }
   p { text-wrap: pretty; }
   ::selection { background: var(--color-gold-light); color: var(--color-ink); }
-  :focus-visible { outline: 3px solid var(--color-gold); outline-offset: 3px; border-radius: 6px; }
+  :focus-visible { outline: 3px solid var(--color-gold-text); outline-offset: 3px; border-radius: 6px; }
+  html { scroll-padding-top: 6rem; }
+  @media (max-width: 639px) { html { scroll-padding-bottom: 6rem; } }
   [x-cloak] { display: none !important; }
   img { max-width: 100%; height: auto; }
 }
@@ -87,22 +90,23 @@
 
   .field { @apply grid gap-1.5; }
   .field > span:first-child, .label { @apply text-[.95rem] font-semibold text-ink; }
-  .input { @apply min-h-12 w-full rounded-xl border border-sand bg-white px-4 py-3 text-[1rem] text-ink placeholder:text-mocha/70; transition: border-color .2s, box-shadow .2s; }
+  .input { @apply min-h-12 w-full rounded-xl border border-line bg-white px-4 py-3 text-[1rem] text-ink placeholder:text-mocha/85; transition: border-color .2s, box-shadow .2s; }
   .input:focus { @apply border-gold outline-none; box-shadow: 0 0 0 4px rgb(181 138 60 / .2); }
   .input[aria-invalid='true'] { @apply border-rose; }
   .err { @apply text-[.92rem] font-medium text-rose; }
   .hint { @apply text-[.92rem] text-mocha; }
 
   /* Selectable tiles (radio inputs) used by the pre-order builder, clip-ins form and quiz. */
-  .tile { @apply relative flex min-h-14 cursor-pointer items-center gap-3 rounded-2xl border border-sand bg-white/70 px-4 py-3 transition; }
+  .tile { @apply relative flex min-h-14 cursor-pointer items-center gap-3 rounded-2xl border border-line bg-white/70 px-4 py-3 transition; }
   .tile:hover { @apply border-gold/70; }
   .tile:has(input:checked) { @apply border-ink bg-ink text-ivory; }
   .tile:has(input:checked) .tile-sub { @apply text-gold-light; }
-  .tile:has(input:focus-visible) { outline: 3px solid var(--color-gold); outline-offset: 3px; }
+  .tile:has(input:focus-visible) { outline: 3px solid var(--color-gold-text); outline-offset: 3px; }
   .tile:has(input:disabled) { @apply cursor-not-allowed opacity-45; }
   .tile input { @apply absolute opacity-0; }
   .tile-sub { @apply text-[.9rem] text-mocha; }
 
+  .foot-link { @apply inline-flex min-h-11 items-center hover:text-gold-light; }
   .chip { @apply inline-flex items-center gap-1.5 rounded-full border border-sand bg-white/70 px-3 py-1 text-[.85rem] font-semibold text-cocoa; }
 
   .watermark { font-family: var(--font-display); font-weight: 500; line-height: .8; color: transparent; -webkit-text-stroke: 1.5px rgb(181 138 60 / .22); user-select: none; pointer-events: none; }
@@ -128,10 +132,8 @@
 .swatch[aria-pressed='true'] .tile-sub { @apply text-gold-light; }
 
 /* ---------- Length ruler ---------- */
-.ruler-tick { @apply absolute left-0 right-0 flex items-center gap-2 text-[.8rem] font-semibold text-mocha; transform: translateY(-50%); }
-.ruler-tick::before { content: ''; width: 14px; height: 1px; background: currentColor; }
-.ruler-hair { transition: height .6s var(--ease-silk); }
-.ruler-marker { transition: top .6s var(--ease-silk); }
+.ruler-hair { transition: d .6s var(--ease-silk); }
+.ruler-marker { transition: transform .6s var(--ease-silk); }
 
 /* ---------- Diary track ---------- */
 .track { display: grid; grid-auto-flow: column; grid-auto-columns: min(82vw, 340px); gap: 1.25rem; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: thin; padding-bottom: 1rem; }
@@ -160,7 +162,6 @@
 .nav-link[aria-current='page'] { @apply text-ink; }
 .nav-link[aria-current='page']::after { content: ''; position: absolute; left: .25rem; right: .25rem; bottom: .45rem; height: 2px; border-radius: 2px; background: var(--color-gold); }
 
-/* Swoosh: the gold curve along the bottom of the flyers. */
 /* A straight gold hairline that fades out at both ends: the footer's only top edge. */
 .footer-rule { position: absolute; inset: 0 0 auto; height: 1px; background: linear-gradient(90deg, transparent, var(--color-gold) 20%, var(--color-gold-light) 50%, var(--color-gold) 80%, transparent); opacity: .7; }
 
@@ -206,9 +207,6 @@ html.is-splash .splash::after { content: ''; position: absolute; inset: auto 0 0
 .splash-word { margin-top: 1.1rem; color: var(--color-ivory); font-family: var(--font-display); font-size: 1.1rem; font-weight: 600; text-transform: uppercase; letter-spacing: .6em; opacity: 0; animation: kq-word 1s var(--ease-silk) .95s forwards; }
 .splash-word span { color: var(--color-gold); }
 .splash-tag { margin-top: .55rem; color: var(--color-gold-light); font-size: .64rem; font-weight: 600; text-transform: uppercase; letter-spacing: .34em; opacity: 0; animation: kq-fade .6s ease 1.25s forwards; }
-/* Content waits for the curtain, then reveals as usual. */
-html.is-splash .reveal { transition-delay: calc(var(--d, 0s) + 2s); }
-html.is-splash .coil.draw path { transition-delay: 2.1s; }
 @keyframes kq-ink { to { stroke-dashoffset: 0; } }
 @keyframes kq-fill { to { fill-opacity: 1; stroke-opacity: 0; } }
 @keyframes kq-crown { from { opacity: 0; transform: translateY(-30px) rotate(-10deg) scale(.5); } to { opacity: 1; transform: none; } }

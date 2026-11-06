@@ -8,7 +8,7 @@
 <section class="wrap py-20 lg:py-24">
     <div class="grid gap-16">
         @foreach($textures as $i => $t)
-            <article @class(['reveal grid items-center gap-10 lg:grid-cols-2 lg:gap-16']) aria-labelledby="t-{{ $t->id }}">
+            <article class="reveal grid items-center gap-10 lg:grid-cols-2 lg:gap-16" aria-labelledby="t-{{ $t->id }}">
                 <div @class(['frame mx-auto w-full max-w-[520px]', 'lg:order-2' => $i % 2 === 1])>
                     <img src="{{ asset($t->image) }}" alt="{{ $t->image_alt }}" width="640" height="760" loading="lazy" class="aspect-[5/6] w-full object-cover" style="view-transition-name: tex-{{ $t->slug }}">
                 </div>

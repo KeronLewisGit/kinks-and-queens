@@ -20,7 +20,7 @@
 
 @section('content')
 {{-- ============ HERO: texture switcher ============ --}}
-<section class="relative overflow-hidden" x-data="textureSwitcher(@js($items))" x-init="start()">
+<section class="relative overflow-hidden" x-data="textureSwitcher(@js($items))" x-init="start()" @mouseenter="stop()" @mouseleave="start()" @focusin="stop()" @focusout="if (! $el.contains($event.relatedTarget)) start()">
     <div aria-hidden="true" class="watermark absolute -left-10 top-6 hidden text-[30rem] xl:block">KQ</div>
     <div class="wrap relative grid items-center gap-12 pb-16 pt-10 lg:grid-cols-[1.05fr_.95fr] lg:gap-16 lg:pb-24 lg:pt-14">
         <div class="reveal">
@@ -63,7 +63,7 @@
                     @endforeach
                 </div>
             </div>
-            <div class="absolute -bottom-6 left-4 right-4 rounded-2xl border border-sand bg-ivory/95 p-4 shadow-[0_20px_40px_-24px_rgb(43_26_17/.6)] backdrop-blur sm:left-auto sm:right-[-1.5rem] sm:w-[300px]" aria-live="polite">
+            <div class="absolute -bottom-6 left-4 right-4 rounded-2xl border border-sand bg-ivory/95 p-4 shadow-[0_20px_40px_-24px_rgb(43_26_17/.6)] backdrop-blur sm:left-auto sm:right-[-1.5rem] sm:w-[300px]">
                 <p class="caps text-gold-text" x-text="current.pattern">{{ $items[0]['pattern'] }}</p>
                 <p class="mt-1 font-display text-[1.25rem] leading-snug" x-text="current.tagline">{{ $items[0]['tagline'] }}</p>
                 <a :href="current.url" href="{{ $items[0]['url'] }}" class="link mt-2 inline-flex min-h-11 items-center text-[.95rem]">See lengths &amp; prices <span aria-hidden="true" class="ml-1">→</span></a>
@@ -93,7 +93,7 @@
     <div class="mt-14 grid gap-8 md:grid-cols-3">
         @foreach($textures as $i => $t)
             <article class="reveal group relative flex flex-col" style="--d:{{ $i * .1 }}s">
-                <a href="{{ route('textures.show', $t) }}" class="block focus:outline-none" aria-label="{{ $t->name }}: lengths and prices">
+                <a href="{{ route('textures.show', $t) }}" class="block" aria-label="{{ $t->name }}: lengths and prices">
                     <div class="frame">
                         <img src="{{ asset($t->image) }}" alt="{{ $t->image_alt }}" width="600" height="760" loading="lazy" class="aspect-[4/5] w-full object-cover transition duration-700 group-hover:scale-[1.015]" style="view-transition-name: tex-{{ $t->slug }}">
                     </div>

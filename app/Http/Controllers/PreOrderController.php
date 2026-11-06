@@ -7,6 +7,7 @@ use App\Models\PriceSet;
 use App\Models\Setting;
 use App\Models\Texture;
 use App\Support\RequestNotifier;
+use App\Support\Submission;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -44,7 +45,9 @@ class PreOrderController extends Controller
             // Honeypot: pretend it worked.
             return redirect()->route('home');
         }
-        abort_if(Setting::get('accepting_orders') !== '1', 503, 'We are not taking new pre-orders right now.');
+        if (Setting::get('accepting_orders') !== '1') {
+            return self::closedResponse($request);
+        }
 
         $data = $request->validate([
             'texture_id' => ['required', Rule::exists('textures', 'id')->where('is_active', true)],
@@ -55,6 +58,11 @@ class PreOrderController extends Controller
             ...self::contactRules(),
         ], self::messages());
 
+        return Submission::once($request, fn () => $this->createOrder($data, $notifier));
+    }
+
+    private function createOrder(array $data, RequestNotifier $notifier): PreOrder
+    {
         $texture = Texture::findOrFail($data['texture_id']);
         if (! $texture->offers($data['format'])) {
             throw ValidationException::withMessages(['format' => "{$texture->name} is not available as ".strtolower(PreOrder::FORMATS[$data['format']]).'.']);
@@ -81,7 +89,8 @@ class PreOrderController extends Controller
             $order->lengths = (string) $data['length'];
             $order->details = array_filter([
                 'length' => $data['length'].'″',
-                'fullness' => isset($data['fullness']) ? ucfirst($data['fullness']).' tracked' : null,
+                // Fullness only applies to clip-ins.
+                'fullness' => $data['format'] === 'clip-ins' && isset($data['fullness']) ? ucfirst($data['fullness']).' tracked' : null,
             ]);
         }
 
@@ -89,9 +98,7 @@ class PreOrderController extends Controller
         $order->events()->create(['status' => 'new']);
         $notifier->send($order);
 
-        $request->session()->put('kq.orders.'.$order->reference, true);
-
-        return redirect()->route('preorder.sent', $order);
+        return $order;
     }
 
     public function sent(Request $request, PreOrder $preOrder): View|RedirectResponse
@@ -107,12 +114,19 @@ class PreOrderController extends Controller
         ]);
     }
 
+    /** A form left open while orders were paused: keep what they typed and explain, instead of an error page. */
+    public static function closedResponse(Request $request): RedirectResponse
+    {
+        return back()->withInput($request->except('_token'))
+            ->withErrors(['form' => 'We have just paused new requests, so this one was not sent. Please DM us on Instagram and we will help you.']);
+    }
+
     /** Contact fields shared by the pre-order and clip-in forms. */
     public static function contactRules(): array
     {
         return [
             'name' => ['required', 'string', 'max:80'],
-            'phone' => ['required', 'string', 'max:40', 'regex:/^[0-9 +().-]{7,}$/'],
+            'phone' => ['required', 'string', 'max:40', 'regex:/^(?=(?:\D*\d){7})[0-9 +().-]+$/'],
             'instagram' => ['nullable', 'string', 'max:60', 'regex:/^@?[A-Za-z0-9._]{1,30}$/'],
             'email' => ['nullable', 'email:rfc', 'max:120'],
             'area' => ['nullable', 'string', 'max:80'],

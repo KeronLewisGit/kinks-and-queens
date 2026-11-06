@@ -33,17 +33,18 @@ class TextureController extends Controller
             ->groupBy(fn ($s) => $s->bundle_count.'-'.($s->isUniform() ? 'same' : 'mixed'))
             ->sortKeys()
             ->map(fn ($sets, $key) => [
-                'title' => match ($key) {
-                    '2-same' => '2-bundle sets',
-                    '3-same' => '3 bundles, one length',
-                    '3-mixed' => '3 bundles, mixed lengths',
-                    '4-same' => '4 bundles, one length',
-                    '4-mixed' => '4 bundles, mixed lengths',
-                    default => $key,
-                },
+                'title' => self::groupTitle($key),
                 'sets' => $sets->sortBy(fn ($s) => $s->longest())->values(),
             ])
             ->sortBy(fn ($g, $key) => ['3-same' => 1, '3-mixed' => 2, '4-same' => 3, '4-mixed' => 4, '2-same' => 5][$key] ?? 9);
+    }
+
+    /** "3-same" → "3 bundles, one length"; works for any bundle count the owner adds. */
+    public static function groupTitle(string $key): string
+    {
+        [$count, $shape] = explode('-', $key) + [1 => 'same'];
+
+        return $count.' bundles, '.($shape === 'same' ? 'one length' : 'mixed lengths');
     }
 
     /** Compact JSON for the pre-order builder, length ruler and quiz. */

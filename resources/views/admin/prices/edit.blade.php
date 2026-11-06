@@ -11,6 +11,7 @@
         <label class="field"><span>Best for</span><input class="input" name="best_for" value="{{ old('best_for', $texture->best_for) }}" required></label>
         <label class="field"><span>Tagline</span><input class="input" name="tagline" value="{{ old('tagline', $texture->tagline) }}" required></label>
         <label class="field"><span>Description</span><textarea class="input min-h-40" name="description" required>{{ old('description', $texture->description) }}</textarea></label>
+        @can('owner')
         <div><p class="label">Available as</p>
             <div class="mt-2 flex flex-wrap gap-4">
                 @foreach(\App\Models\PreOrder::FORMATS as $k => $l)
@@ -19,6 +20,9 @@
             </div>
         </div>
         <label class="flex min-h-11 items-center gap-2"><input type="hidden" name="is_active" value="0"><input type="checkbox" name="is_active" value="1" class="size-5 accent-[#2b1a11]" @checked($texture->is_active)> Show this texture on the website</label>
+        @else
+        <p class="hint">Available as {{ collect($texture->formats)->map(fn ($f) => strtolower(\App\Models\PreOrder::FORMATS[$f] ?? $f))->join(', ', ' and ') }}. {{ $texture->is_active ? 'Shown on the website.' : 'Hidden from the website.' }} Only the owner can change these.</p>
+        @endcan
     </section>
     <section class="card bg-white p-6">
         <h2 class="text-2xl">Sets and prices</h2>

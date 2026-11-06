@@ -22,7 +22,7 @@
                 <div><dt class="hint">Request</dt><dd class="font-semibold">{{ $order->title() }}</dd></div>
                 @if($order->lengthsLabel())<div><dt class="hint">Length</dt><dd class="font-semibold">{{ $order->lengthsLabel() }}</dd></div>@endif
                 @if($order->quoted_price)<div><dt class="hint">List price</dt><dd class="font-semibold"><x-money :amount="$order->quoted_price"/></dd></div>@endif
-                <div><dt class="hint">We’ll reach you by</dt><dd class="font-semibold">{{ ['instagram' => 'Instagram DM', 'whatsapp' => 'WhatsApp', 'phone' => 'Phone call'][$order->contact_via] }}</dd></div>
+                <div><dt class="hint">We’ll reach you by</dt><dd class="font-semibold">{{ $order->contactViaLabel() }}</dd></div>
             </dl>
         </div>
 

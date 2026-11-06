@@ -88,6 +88,54 @@ class AdminTest extends TestCase
         $this->actingAs($this->staff)->post('/admin/prices/'.$t->slug.'/sets', ['lengths' => '30,30,30', 'price' => 1])->assertSessionHasErrors('lengths');
     }
 
+    public function test_a_request_cannot_be_moved_to_the_step_it_is_already_on_without_a_note(): void
+    {
+        $o = PreOrder::create(['kind' => 'hair', 'name' => 'Q', 'phone' => '8685550123', 'contact_via' => 'phone']);
+        $o->events()->create(['status' => 'new']);
+        $this->actingAs($this->staff)->post(route('admin.orders.status', $o), ['status' => 'new'])->assertSessionHasErrors('status');
+        $this->actingAs($this->staff)->post(route('admin.orders.status', $o), ['status' => 'new', 'note' => 'Waiting on your lengths'])->assertSessionHasNoErrors();
+        $this->assertSame(2, $o->events()->count());
+    }
+
+    public function test_expected_date_is_a_date_and_far_dates_are_rejected(): void
+    {
+        $o = PreOrder::create(['kind' => 'hair', 'name' => 'Q', 'phone' => '8685550123', 'contact_via' => 'phone']);
+        $this->actingAs($this->staff)->patch(route('admin.orders.update', $o), ['expected_at' => '20266-01-01'])->assertSessionHasErrors('expected_at');
+        $this->actingAs($this->staff)->patch(route('admin.orders.update', $o), ['expected_at' => '2040-03-02'])->assertSessionHasNoErrors();
+        $this->assertSame('2040-03-02', $o->fresh()->expected_at->toDateString());
+    }
+
+    public function test_completed_this_month_counts_completions_not_edits(): void
+    {
+        $old = PreOrder::create(['kind' => 'hair', 'name' => 'Old', 'phone' => '8685550123', 'contact_via' => 'phone', 'status' => 'completed']);
+        $old->events()->forceCreate(['status' => 'completed', 'created_at' => now()->subMonths(2)]);
+        $old->update(['staff_notes' => 'edited today']);
+        $new = PreOrder::create(['kind' => 'hair', 'name' => 'New', 'phone' => '8685550124', 'contact_via' => 'phone']);
+        $new->moveTo('completed');
+        $this->actingAs($this->owner)->get('/admin')->assertViewHas('monthCompleted', 1);
+    }
+
+    public function test_only_the_owner_can_hide_a_texture_or_change_its_formats(): void
+    {
+        $t = Texture::first();
+        $payload = ['tagline' => 'New tagline', 'description' => $t->description, 'best_for' => $t->best_for, 'is_active' => '0', 'formats' => ['bundles']];
+        $this->actingAs($this->staff)->put('/admin/prices/'.$t->slug, $payload)->assertRedirect();
+        $t->refresh();
+        $this->assertSame('New tagline', $t->tagline);
+        $this->assertTrue($t->is_active);
+        $this->assertGreaterThan(1, count($t->formats));
+
+        $this->actingAs($this->owner)->put('/admin/prices/'.$t->slug, $payload)->assertRedirect();
+        $this->assertFalse($t->fresh()->is_active);
+    }
+
+    public function test_new_price_sets_are_stored_shortest_first(): void
+    {
+        $t = Texture::first();
+        $this->actingAs($this->staff)->post('/admin/prices/'.$t->slug.'/sets', ['lengths' => '26, 22, 24', 'price' => 4000])->assertRedirect();
+        $this->assertDatabaseHas('price_sets', ['texture_id' => $t->id, 'lengths' => '22,24,26']);
+    }
+
     public function test_photo_upload_and_hide(): void
     {
         Storage::fake('public');
@@ -96,11 +144,29 @@ class AdminTest extends TestCase
         ])->assertRedirect();
         $photo = GalleryPhoto::where('alt', 'Ponytail side view')->first();
         Storage::disk('public')->assertExists($photo->path);
+        // Re-encoded: WebP, no camera metadata, never wider than the cap.
+        $this->assertStringEndsWith('.webp', $photo->path);
+        [$w, $h] = getimagesizefromstring(Storage::disk('public')->get($photo->path));
+        $this->assertSame([800, 1000], [$w, $h]);
         $this->assertSame($photo->id, GalleryPhoto::orderBy('sort')->first()->id, 'new uploads lead the gallery');
 
         $this->actingAs($this->staff)->patch('/admin/photos/'.$photo->id, ['alt' => 'Ponytail', 'sort' => 0])->assertRedirect();
         $this->assertFalse($photo->fresh()->is_visible);
         $this->get('/queen-cam')->assertDontSee($photo->path);
+    }
+
+    public function test_large_photos_are_scaled_down(): void
+    {
+        Storage::fake('public');
+        $this->actingAs($this->staff)->post('/admin/photos', ['photo' => UploadedFile::fake()->image('big.jpg', 3000, 2000), 'alt' => 'Wide shot'])->assertRedirect();
+        [$w, $h] = getimagesizefromstring(Storage::disk('public')->get(GalleryPhoto::where('alt', 'Wide shot')->value('path')));
+        $this->assertSame([1800, 1200], [$w, $h]);
+    }
+
+    public function test_cleared_settings_stay_cleared(): void
+    {
+        $this->actingAs($this->owner)->put('/admin/settings', ['instagram_handle' => 'kinksandqueens', 'tiktok_handle' => '', 'announcement' => '', 'footer_note' => ''])->assertRedirect();
+        $this->get('/')->assertDontSee('Jesus is Lord.')->assertDontSee('tiktok.com', false)->assertDontSee('We do not carry ready stock');
     }
 
     public function test_owner_settings_change_the_site(): void

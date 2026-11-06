@@ -14,25 +14,25 @@
             @error('phone')<span id="e-phone" class="err">{{ $message }}</span>@enderror
         </label>
     </div>
-    <div>
-        <p class="label">How should we reach you?</p>
+    <fieldset @error('contact_via') aria-describedby="e-contact" @enderror>
+        <legend class="label">How should we reach you?</legend>
         <div class="mt-2 grid gap-2 sm:grid-cols-3">
-            @foreach(['instagram' => 'Instagram DM', 'whatsapp' => 'WhatsApp', 'phone' => 'Phone call'] as $v => $l)
+            @foreach(\App\Models\PreOrder::CONTACT_VIA as $v => $l)
                 <label class="tile"><input type="radio" name="contact_via" value="{{ $v }}" @checked(old('contact_via', 'instagram') === $v)><span class="font-semibold">{{ $l }}</span></label>
             @endforeach
         </div>
-        @error('contact_via')<span class="err">{{ $message }}</span>@enderror
-    </div>
+        @error('contact_via')<span id="e-contact" class="err">{{ $message }}</span>@enderror
+    </fieldset>
     <div class="grid gap-5 sm:grid-cols-2">
         <label class="field">
             <span>Instagram username <span class="font-normal text-mocha">(optional)</span></span>
-            <input class="input" name="instagram" value="{{ old('instagram') }}" placeholder="@yourname" autocapitalize="none" maxlength="60" @error('instagram') aria-invalid="true" @enderror>
-            @error('instagram')<span class="err">{{ $message }}</span>@enderror
+            <input class="input" name="instagram" value="{{ old('instagram') }}" placeholder="@yourname" autocapitalize="none" maxlength="60" @error('instagram') aria-invalid="true" aria-describedby="e-instagram" @enderror>
+            @error('instagram')<span id="e-instagram" class="err">{{ $message }}</span>@enderror
         </label>
         <label class="field">
             <span>Email <span class="font-normal text-mocha">(optional)</span></span>
-            <input class="input" name="email" type="email" value="{{ old('email') }}" autocomplete="email" maxlength="120" @error('email') aria-invalid="true" @enderror>
-            @error('email')<span class="err">{{ $message }}</span>@enderror
+            <input class="input" name="email" type="email" value="{{ old('email') }}" autocomplete="email" maxlength="120" @error('email') aria-invalid="true" aria-describedby="e-email" @enderror>
+            @error('email')<span id="e-email" class="err">{{ $message }}</span>@enderror
         </label>
     </div>
     <label class="field">
@@ -45,8 +45,8 @@
     </label>
     <div class="hidden" aria-hidden="true"><label>Website <input name="website" tabindex="-1" autocomplete="off"></label></div>
     <label class="flex items-start gap-3">
-        <input type="checkbox" name="consent" value="1" class="mt-1 size-5 shrink-0 accent-[#2b1a11]" @checked(old('consent')) required>
+        <input type="checkbox" name="consent" value="1" class="mt-1 size-5 shrink-0 accent-[#2b1a11]" @checked(old('consent')) required @error('consent') aria-invalid="true" aria-describedby="e-consent" @enderror>
         <span class="text-[.98rem] text-cocoa">Kinks &amp; Queens may contact me about this request. My details are used only for this order. <a href="{{ route('privacy') }}" class="link">Privacy</a></span>
     </label>
-    @error('consent')<span class="err">{{ $message }}</span>@enderror
+    @error('consent')<span id="e-consent" class="err">{{ $message }}</span>@enderror
 </fieldset>

@@ -20,7 +20,7 @@ class SettingsController extends Controller
         $data = $request->validate([
             'instagram_handle' => ['required', 'string', 'max:30', 'regex:/^[A-Za-z0-9._]+$/'],
             'tiktok_handle' => ['nullable', 'string', 'max:30', 'regex:/^[A-Za-z0-9._]+$/'],
-            'whatsapp_number' => ['nullable', 'string', 'max:30', 'regex:/^[0-9 +().-]{7,}$/'],
+            'whatsapp_number' => ['nullable', 'string', 'max:30', 'regex:/^(?=(?:\D*\d){7})[0-9 +().-]+$/'],
             'notify_email' => ['nullable', 'email'],
             'announcement' => ['nullable', 'string', 'max:160'],
             'footer_note' => ['nullable', 'string', 'max:80'],

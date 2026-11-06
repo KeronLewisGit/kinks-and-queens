@@ -10,6 +10,7 @@ use App\Models\Texture;
 use Database\Seeders\CatalogueSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class PreOrderTest extends TestCase
@@ -115,7 +116,73 @@ class PreOrderTest extends TestCase
         Setting::put('accepting_orders', '0');
         $this->get('/pre-order')->assertSee('not taking new pre-orders');
         $set = PriceSet::first();
-        $this->post('/pre-order', $this->contact(['texture_id' => $set->texture_id, 'format' => 'bundles', 'price_set_id' => $set->id]))->assertStatus(503);
+        $this->from('/pre-order')->post('/pre-order', $this->contact(['texture_id' => $set->texture_id, 'format' => 'bundles', 'price_set_id' => $set->id]))
+            ->assertRedirect('/pre-order')->assertSessionHasErrors('form')->assertSessionHasInput('name', 'Test Queen');
+        $this->assertSame(0, PreOrder::count());
+
+        $this->get('/clip-ins')->assertSee('not taking new clip-in requests');
+        $this->from('/clip-ins')->post('/clip-ins', $this->contact(['texture' => 'Body wave', 'bundles' => '3', 'fullness' => 'double']))
+            ->assertSessionHasErrors('form');
+        $this->assertSame(0, PreOrder::count());
+    }
+
+    public function test_a_repeated_submission_shows_the_first_request_instead_of_a_copy(): void
+    {
+        $set = PriceSet::first();
+        $payload = $this->contact(['texture_id' => $set->texture_id, 'format' => 'bundles', 'price_set_id' => $set->id, 'submission' => (string) Str::uuid()]);
+
+        $first = $this->post('/pre-order', $payload);
+        $order = PreOrder::sole();
+        $first->assertRedirect(route('preorder.sent', $order));
+
+        $this->post('/pre-order', $payload)->assertRedirect(route('preorder.sent', $order));
+        $this->assertSame(1, PreOrder::count());
+
+        // A fresh form (new token) is a new request.
+        $this->post('/pre-order', array_merge($payload, ['submission' => (string) Str::uuid()]))->assertRedirect();
+        $this->assertSame(2, PreOrder::count());
+    }
+
+    public function test_a_failed_submission_can_be_corrected_and_sent_with_the_same_token(): void
+    {
+        $set = PriceSet::first();
+        $payload = $this->contact(['texture_id' => $set->texture_id, 'format' => 'bundles', 'price_set_id' => 999999, 'submission' => (string) Str::uuid()]);
+        $this->post('/pre-order', $payload)->assertSessionHasErrors('price_set_id');
+        $this->post('/pre-order', array_merge($payload, ['price_set_id' => $set->id]))->assertRedirect();
+        $this->assertSame(1, PreOrder::count());
+    }
+
+    public function test_ponytails_are_saved_without_a_fullness(): void
+    {
+        $t = Texture::where('slug', 'brazilian-kinky-curly')->first();
+        $this->post('/pre-order', $this->contact(['texture_id' => $t->id, 'format' => 'ponytail', 'length' => 20, 'fullness' => 'double']))->assertRedirect();
+        $this->assertArrayNotHasKey('fullness', PreOrder::sole()->details);
+    }
+
+    public function test_phone_needs_seven_digits_not_just_punctuation(): void
+    {
+        $set = PriceSet::first();
+        $this->post('/pre-order', $this->contact(['phone' => '-------', 'texture_id' => $set->texture_id, 'format' => 'bundles', 'price_set_id' => $set->id]))
+            ->assertSessionHasErrors('phone');
+    }
+
+    public function test_too_many_requests_keep_what_was_typed(): void
+    {
+        $set = PriceSet::first();
+        $payload = $this->contact(['texture_id' => $set->texture_id, 'format' => 'bundles', 'price_set_id' => $set->id]);
+        for ($i = 0; $i < 6; $i++) {
+            $this->post('/pre-order', $payload)->assertRedirect();
+        }
+        $this->from('/pre-order')->post('/pre-order', $payload)
+            ->assertRedirect('/pre-order')->assertSessionHasErrors('form')->assertSessionHasInput('phone', '868 555 0199');
+        $this->assertSame(6, PreOrder::count());
+    }
+
+    public function test_an_expired_form_goes_back_with_its_input(): void
+    {
+        $this->app['env'] = 'production';
+        $this->withMiddleware()->from('/clip-ins')->post('/clip-ins', $this->contact(['texture' => 'Body wave']))
+            ->assertRedirect('/clip-ins')->assertSessionHasErrors('form')->assertSessionHasInput('texture', 'Body wave');
     }
 
     public function test_whatsapp_handoff_appears_only_when_a_number_is_set(): void

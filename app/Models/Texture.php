@@ -8,6 +8,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Texture extends Model
 {
+    /** Where each length falls on the body; the length ruler uses it with and without JavaScript. */
+    public const FALLS_TO = [
+        10 => 'the chin', 12 => 'just above the shoulders', 14 => 'the shoulders', 16 => 'the collarbone',
+        18 => 'below the collarbone', 20 => 'mid-chest', 22 => 'the bra strap', 24 => 'mid-back',
+        26 => 'the waist', 28 => 'past the waist',
+    ];
+
     protected $fillable = [
         'slug', 'name', 'origin', 'pattern', 'script_word', 'best_for', 'tagline', 'description',
         'highlights', 'formats', 'bundle_weight', 'image', 'image_alt', 'coil', 'sort', 'is_active',

@@ -46,6 +46,9 @@ class OrderController extends Controller
             'status' => ['required', Rule::in(array_keys(PreOrder::STATUSES))],
             'note' => ['nullable', 'string', 'max:240'],
         ]);
+        if ($data['status'] === $preOrder->status && blank($data['note'] ?? null)) {
+            return back()->withErrors(['status' => 'This request is already “'.$preOrder->statusLabel().'”. Choose another step, or add a note for the customer.']);
+        }
         $preOrder->moveTo($data['status'], $data['note'] ?? null, $request->user());
 
         return back()->with('ok', 'Moved to “'.$preOrder->statusLabel().'”. The customer sees this on their tracking page.');
@@ -55,7 +58,7 @@ class OrderController extends Controller
     {
         $data = $request->validate([
             'quoted_price' => ['nullable', 'integer', 'min:0', 'max:100000'],
-            'expected_at' => ['nullable', 'date'],
+            'expected_at' => ['nullable', 'date', 'after:2020-01-01', 'before:2100-01-01'],
             'staff_notes' => ['nullable', 'string', 'max:2000'],
         ]);
         $preOrder->update($data);

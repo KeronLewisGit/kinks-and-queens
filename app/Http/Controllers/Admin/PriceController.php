@@ -7,6 +7,7 @@ use App\Models\PriceSet;
 use App\Models\Texture;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -14,7 +15,7 @@ class PriceController extends Controller
 {
     public function index(): View
     {
-        return view('admin.prices.index', ['textures' => Texture::orderBy('sort')->withCount('priceSets')->with('priceSets')->get()]);
+        return view('admin.prices.index', ['textures' => Texture::orderBy('sort')->with('priceSets')->get()]);
     }
 
     public function edit(Texture $texture): View
@@ -38,13 +39,19 @@ class PriceController extends Controller
             'sets.*.is_active' => ['boolean'],
         ]);
 
-        $texture->update([
+        $texture->fill([
             'tagline' => $data['tagline'],
             'description' => $data['description'],
             'best_for' => $data['best_for'],
-            'is_active' => $request->boolean('is_active'),
-            'formats' => array_values($data['formats'] ?? ['bundles']),
         ]);
+        // Hiding a texture or changing what it is sold as is the owner's call; staff keep prices and copy current.
+        if (Gate::allows('owner')) {
+            $texture->fill([
+                'is_active' => $request->boolean('is_active'),
+                'formats' => array_values($data['formats'] ?? ['bundles']),
+            ]);
+        }
+        $texture->save();
 
         foreach ($data['sets'] ?? [] as $id => $row) {
             PriceSet::where('texture_id', $texture->id)->whereKey($id)->update([
@@ -63,7 +70,7 @@ class PriceController extends Controller
             'price' => ['required', 'integer', 'min:1', 'max:100000'],
         ], ['lengths.regex' => 'Write lengths in inches separated by commas, for example 16,18,20.']);
 
-        $lengths = collect(explode(',', $data['lengths']))->map(fn ($l) => (int) trim($l));
+        $lengths = collect(explode(',', $data['lengths']))->map(fn ($l) => (int) trim($l))->sort()->values();
         if ($lengths->contains(fn ($l) => $l < 8 || $l > 40)) {
             return back()->withErrors(['lengths' => 'Lengths must be between 8″ and 40″.']);
         }

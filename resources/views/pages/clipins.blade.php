@@ -35,19 +35,21 @@
     <div class="min-w-0">
         <h2 class="text-4xl sm:text-5xl">Request a clip-in set</h2>
         <p class="mt-3 max-w-[60ch] text-cocoa">Tell us about the bundles you have. We’ll message you with a quote and drop-off details.</p>
-        <form method="POST" action="{{ route('clipins.store') }}" class="mt-10 grid gap-10" novalidate>
+        @if($accepting)
+        <form method="POST" action="{{ route('clipins.store') }}" class="mt-10 grid gap-10" novalidate data-once>
             @csrf
-            @if($errors->any())<div class="rounded-2xl border border-rose/40 bg-rose/5 p-5 font-semibold text-rose" role="alert">Please check the highlighted fields.</div>@endif
+            <input type="hidden" name="submission" value="{{ \Illuminate\Support\Str::uuid() }}">
+            <x-form-alert/>
             <fieldset class="grid gap-5">
                 <legend class="mb-4 font-display text-[1.7rem]">Your bundles</legend>
                 <label class="field">
                     <span>Texture of your bundles</span>
-                    <input class="input" name="texture" value="{{ old('texture') }}" list="clip-textures" placeholder="e.g. Brazilian Textured Straight" required maxlength="80" @error('texture') aria-invalid="true" @enderror>
+                    <input class="input" name="texture" value="{{ old('texture') }}" list="clip-textures" placeholder="e.g. Brazilian Textured Straight" required maxlength="80" @error('texture') aria-invalid="true" aria-describedby="e-clip-texture" @enderror>
                     <datalist id="clip-textures">
                         @foreach(\App\Models\Texture::active()->get() as $t)<option value="{{ $t->name }}">@endforeach
                         <option value="Body wave"><option value="Deep wave"><option value="Not sure">
                     </datalist>
-                    @error('texture')<span class="err">{{ $message }}</span>@enderror
+                    @error('texture')<span id="e-clip-texture" class="err">{{ $message }}</span>@enderror
                 </label>
                 <div class="grid gap-5 sm:grid-cols-2">
                     <label class="field">
@@ -61,22 +63,22 @@
                         <input class="input" name="length" value="{{ old('length') }}" placeholder="e.g. 18″" maxlength="40">
                     </label>
                 </div>
-                <div>
-                    <p class="label">Fullness</p>
+                <fieldset>
+                    <legend class="label">Fullness</legend>
                     <div class="mt-2 grid gap-2 sm:grid-cols-3">
                         @foreach(['double' => ['Double tracked', 'Natural fullness'], 'triple' => ['Triple tracked', 'Extra volume'], 'advise' => ['Advise me', 'We’ll suggest one']] as $v => [$l, $s])
                             <label class="tile"><input type="radio" name="fullness" value="{{ $v }}" @checked(old('fullness', 'double') === $v)><span class="grid"><span class="font-semibold">{{ $l }}</span><span class="tile-sub">{{ $s }}</span></span></label>
                         @endforeach
                     </div>
-                </div>
-                <div>
-                    <p class="label">Your own hair</p>
+                </fieldset>
+                <fieldset>
+                    <legend class="label">Your own hair</legend>
                     <div class="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
                         @foreach(['Natural', 'Relaxed', 'Silk-pressed', 'Not sure'] as $h)
                             <label class="tile"><input type="radio" name="own_hair" value="{{ $h }}" @checked(old('own_hair') === $h)><span class="font-semibold">{{ $h }}</span></label>
                         @endforeach
                     </div>
-                </div>
+                </fieldset>
             </fieldset>
             <x-contact-fields notes-placeholder="The styles you want to wear, when you need the set…"/>
             <div class="grid gap-3 sm:flex sm:items-center sm:gap-5">
@@ -84,6 +86,9 @@
                 <p class="hint">Nothing to pay now. We quote first.</p>
             </div>
         </form>
+        @else
+            <div class="mt-10"><x-orders-closed what="clip-in requests"/></div>
+        @endif
     </div>
 
     <aside aria-labelledby="clip-next-h">

@@ -1,4 +1,4 @@
-@extends('layouts.app', ['title' => 'Privacy'])
+@extends('layouts.app', ['title' => 'Privacy', 'description' => 'How Kinks & Queens uses the details you send with a pre-order or clip-in request, how long we keep them and how to ask us to delete them.'])
 
 @section('content')
 <x-page-hero title="Privacy" lead="What we collect when you send a request, and what we do with it." image="assets/img/straight-blend.webp" alt="Brazilian Textured Straight blended with relaxed hair" coil="wave"/>

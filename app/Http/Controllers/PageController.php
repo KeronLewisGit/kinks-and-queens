@@ -66,6 +66,14 @@ class PageController extends Controller
         return view('pages.privacy');
     }
 
+    /** Served by the app so the sitemap line is an absolute URL on whatever domain the site runs on. */
+    public function robots(): Response
+    {
+        $lines = ['User-agent: *', 'Disallow: /admin', 'Disallow: /track/', 'Disallow: /pre-order/sent/', '', 'Sitemap: '.route('sitemap')];
+
+        return response(implode("\n", $lines)."\n")->header('Content-Type', 'text/plain; charset=UTF-8');
+    }
+
     public function sitemap(): Response
     {
         $urls = collect(['home', 'textures.index', 'match', 'preorder', 'clipins', 'gallery', 'care', 'faq', 'story', 'track', 'privacy'])

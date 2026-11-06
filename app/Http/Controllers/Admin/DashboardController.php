@@ -18,7 +18,10 @@ class DashboardController extends Controller
             'arrivingSoon' => PreOrder::with('texture')->where('status', 'ordered')->orderBy('expected_at')->take(5)->get(),
             'ready' => PreOrder::with('texture')->where('status', 'ready')->oldest('updated_at')->get(),
             'pipelineValue' => $open->whereIn('status', ['confirmed', 'paid', 'ordered', 'ready'])->sum('quoted_price'),
-            'monthCompleted' => PreOrder::where('status', 'completed')->where('updated_at', '>=', now()->startOfMonth())->count(),
+            // Completed this month = moved to "completed" this month, not merely edited.
+            'monthCompleted' => PreOrder::where('status', 'completed')
+                ->whereHas('events', fn ($e) => $e->where('status', 'completed')->where('created_at', '>=', now()->startOfMonth()))
+                ->count(),
         ]);
     }
 }

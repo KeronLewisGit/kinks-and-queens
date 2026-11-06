@@ -4,6 +4,9 @@
     $description = $description ?? 'Premium 100% human textured hair: Brazilian Kinky Curly, Mongolian Afro Coily and Brazilian Textured Straight bundles, ponytails and custom clip-ins. Pre-order in Trinidad & Tobago.';
     $ogImage = asset($ogImage ?? 'assets/img/kinky-curly-portrait.webp');
     $ig = Setting::instagramUrl();
+    $tiktok = Setting::tiktokUrl();
+    // The phone-only "Start a pre-order" bar is hidden where the page already is the form.
+    $mobileCta = ! request()->routeIs('preorder*', 'track*', 'clipins');
     $nav = [
         ['Textures', route('textures.index'), 'textures*'],
         ['Clip-ins', route('clipins'), 'clip-ins'],
@@ -29,6 +32,7 @@
     <meta property="og:url" content="{{ url()->current() }}">
     <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    @include('partials.transition-guard')
     {{-- Decide on the splash before first paint: once per session, never with reduced motion. --}}
     <script>
         (function () {
@@ -57,17 +61,11 @@
         'image' => asset('assets/img/kinky-curly-portrait.webp'),
         'areaServed' => 'Trinidad and Tobago',
         'priceRange' => 'TT$1,680–TT$4,745',
-        'sameAs' => [$ig, 'https://www.tiktok.com/@'.Setting::get('tiktok_handle')],
+        'sameAs' => array_values(array_filter([$ig, $tiktok])),
     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
 </head>
-<body class="min-h-screen" x-data="{ menu: false }" @keydown.escape.window="menu = false">
-    <svg width="0" height="0" class="absolute" aria-hidden="true" focusable="false">
-        <defs>
-            <linearGradient id="kq-gold" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stop-color="#e6c77f"/><stop offset=".55" stop-color="#b58a3c"/><stop offset="1" stop-color="#8c6421"/>
-            </linearGradient>
-        </defs>
-    </svg>
+<body class="min-h-screen" x-data="{ menu: false }" @keydown.escape.window="menu = false" @pageshow.window="menu = false">
+    @include('partials.gold-gradient')
     @include('partials.splash')
     <a href="#main" class="fixed left-4 top-3 z-[60] -translate-y-24 rounded-full bg-ink px-5 py-3 font-semibold text-ivory focus:translate-y-0">Skip to content</a>
 
@@ -139,34 +137,36 @@
                 <h2 class="caps text-gold-light">Shop</h2>
                 <ul class="mt-4 grid gap-1">
                     @foreach(\App\Models\Texture::active()->get() as $t)
-                        <li><a class="inline-flex min-h-11 items-center hover:text-gold-light" href="{{ route('textures.show', $t) }}">{{ $t->name }}</a></li>
+                        <li><a class="foot-link" href="{{ route('textures.show', $t) }}">{{ $t->name }}</a></li>
                     @endforeach
-                    <li><a class="inline-flex min-h-11 items-center hover:text-gold-light" href="{{ route('clipins') }}">Custom clip-ins</a></li>
+                    <li><a class="foot-link" href="{{ route('clipins') }}">Custom clip-ins</a></li>
                 </ul>
             </div>
             <div>
                 <h2 class="caps text-gold-light">Help</h2>
                 <ul class="mt-4 grid gap-1">
-                    <li><a class="inline-flex min-h-11 items-center hover:text-gold-light" href="{{ route('match') }}">Texture Match quiz</a></li>
-                    <li><a class="inline-flex min-h-11 items-center hover:text-gold-light" href="{{ route('track') }}">Track my order</a></li>
-                    <li><a class="inline-flex min-h-11 items-center hover:text-gold-light" href="{{ route('care') }}">Care guide</a></li>
-                    <li><a class="inline-flex min-h-11 items-center hover:text-gold-light" href="{{ route('faq') }}">FAQ</a></li>
-                    <li><a class="inline-flex min-h-11 items-center hover:text-gold-light" href="{{ route('story') }}">Our story</a></li>
+                    <li><a class="foot-link" href="{{ route('match') }}">Texture Match quiz</a></li>
+                    <li><a class="foot-link" href="{{ route('track') }}">Track my order</a></li>
+                    <li><a class="foot-link" href="{{ route('care') }}">Care guide</a></li>
+                    <li><a class="foot-link" href="{{ route('faq') }}">FAQ</a></li>
+                    <li><a class="foot-link" href="{{ route('story') }}">Our story</a></li>
                 </ul>
             </div>
             <div>
                 <h2 class="caps text-gold-light">Talk to us</h2>
                 <ul class="mt-4 grid gap-1">
-                    <li><a class="inline-flex min-h-11 items-center hover:text-gold-light" href="{{ Setting::instagramDm() }}" rel="noopener">DM on Instagram</a></li>
+                    <li><a class="foot-link" href="{{ Setting::instagramDm() }}" rel="noopener">DM on Instagram</a></li>
                     @if($wa = Setting::whatsappLink())
-                        <li><a class="inline-flex min-h-11 items-center hover:text-gold-light" href="{{ $wa }}" rel="noopener">WhatsApp</a></li>
+                        <li><a class="foot-link" href="{{ $wa }}" rel="noopener">WhatsApp</a></li>
                     @endif
-                    <li><a class="inline-flex min-h-11 items-center hover:text-gold-light" href="{{ $ig }}" rel="noopener">{{ '@'.Setting::get('instagram_handle') }}</a></li>
-                    <li><a class="inline-flex min-h-11 items-center hover:text-gold-light" href="{{ 'https://www.tiktok.com/@'.Setting::get('tiktok_handle') }}" rel="noopener">TikTok</a></li>
+                    <li><a class="foot-link" href="{{ $ig }}" rel="noopener">{{ '@'.Setting::get('instagram_handle') }}</a></li>
+                    @if($tiktok)
+                        <li><a class="foot-link" href="{{ $tiktok }}" rel="noopener">TikTok</a></li>
+                    @endif
                 </ul>
             </div>
         </div>
-        <div class="wrap relative flex flex-col gap-3 border-t border-ivory/10 pb-24 pt-6 text-[.88rem] sm:pb-6 text-ivory/65 sm:flex-row sm:items-center sm:justify-between">
+        <div @class(['wrap relative flex flex-col gap-3 border-t border-ivory/10 pt-6 text-[.88rem] text-ivory/65 sm:flex-row sm:items-center sm:justify-between', 'pb-24 sm:pb-6' => $mobileCta, 'pb-6' => ! $mobileCta])>
             <p>© {{ date('Y') }} Kinks &amp; Queens. Pre-order only. Prices in Trinidad &amp; Tobago dollars.</p>
             <p class="flex flex-wrap gap-x-5 gap-y-1">
                 @if($fn = Setting::get('footer_note'))<span class="text-gold-light">{{ $fn }}</span>@endif
@@ -176,10 +176,10 @@
     </footer>
 
     {{-- Phone: keep the main action in reach. --}}
-    @unless(request()->routeIs('preorder*', 'track*', 'clipins'))
+    @if($mobileCta)
         <div class="fixed inset-x-3 bottom-3 z-30 sm:hidden">
             <a href="{{ route('preorder') }}" class="btn btn-gold w-full shadow-xl"><x-crown class="-mt-0.5"/> Start a pre-order</a>
         </div>
-    @endunless
+    @endif
 </body>
 </html>

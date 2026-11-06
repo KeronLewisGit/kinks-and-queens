@@ -1,32 +1,4 @@
 {
-  "_fonts-C9MNnjVw.css": {
-    "file": "assets/fonts-C9MNnjVw.css",
-    "src": "_fonts-C9MNnjVw.css"
-  },
-  "_instrument-sans-400-normal-D1W7dsQl.woff": {
-    "file": "assets/instrument-sans-400-normal-D1W7dsQl.woff",
-    "src": "_instrument-sans-400-normal-D1W7dsQl.woff"
-  },
-  "_instrument-sans-400-normal-DRC__1Mx.woff2": {
-    "file": "assets/instrument-sans-400-normal-DRC__1Mx.woff2",
-    "src": "_instrument-sans-400-normal-DRC__1Mx.woff2"
-  },
-  "_instrument-sans-500-normal-Dk9ku72i.woff2": {
-    "file": "assets/instrument-sans-500-normal-Dk9ku72i.woff2",
-    "src": "_instrument-sans-500-normal-Dk9ku72i.woff2"
-  },
-  "_instrument-sans-500-normal-Z6ESRlEs.woff": {
-    "file": "assets/instrument-sans-500-normal-Z6ESRlEs.woff",
-    "src": "_instrument-sans-500-normal-Z6ESRlEs.woff"
-  },
-  "_instrument-sans-600-normal-B7fBEWYG.woff2": {
-    "file": "assets/instrument-sans-600-normal-B7fBEWYG.woff2",
-    "src": "_instrument-sans-600-normal-B7fBEWYG.woff2"
-  },
-  "_instrument-sans-600-normal-B9e8oLYv.woff": {
-    "file": "assets/instrument-sans-600-normal-B9e8oLYv.woff",
-    "src": "_instrument-sans-600-normal-B9e8oLYv.woff"
-  },
   "node_modules/@fontsource-variable/albert-sans/files/albert-sans-latin-ext-wght-normal.woff2": {
     "file": "assets/albert-sans-latin-ext-wght-normal-BAo4qCk1.woff2",
     "src": "node_modules/@fontsource-variable/albert-sans/files/albert-sans-latin-ext-wght-normal.woff2"
@@ -76,7 +48,7 @@
     "src": "node_modules/@fontsource/allura/files/allura-latin-400-normal.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-Bojlxljz.css",
+    "file": "assets/app-Cgz4Z1pj.css",
     "name": "app",
     "names": [
       "app.css"
@@ -99,7 +71,7 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-DCB3CKXS.js",
+    "file": "assets/app-qT2Fo6Yc.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true

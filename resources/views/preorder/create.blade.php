@@ -5,23 +5,16 @@
 
 <section class="wrap py-16 lg:py-20">
     @unless($accepting)
-        <div class="card mx-auto max-w-[640px] p-8 text-center">
-            <h2 class="text-3xl">We’re not taking new pre-orders right now</h2>
-            <p class="mt-3 text-cocoa">Follow us on Instagram to hear when orders open again, or send us a DM.</p>
-            <a class="btn btn-primary mt-6" href="{{ \App\Models\Setting::instagramDm() }}" rel="noopener">DM us on Instagram</a>
-        </div>
+        <x-orders-closed/>
     @else
-    <form method="POST" action="{{ route('preorder.store') }}" x-data="preorder(@js($catalogue), @js($prefill))" class="grid gap-10 lg:grid-cols-[1fr_360px] lg:gap-14" novalidate>
+    <form method="POST" action="{{ route('preorder.store') }}" data-once x-data="preorder(@js($catalogue), @js($prefill))" class="grid gap-10 lg:grid-cols-[1fr_360px] lg:gap-14" novalidate>
         @csrf
+        <input type="hidden" name="submission" value="{{ \Illuminate\Support\Str::uuid() }}">
         <div class="grid gap-12">
-            @if($errors->any())
-                <div class="rounded-2xl border border-rose/40 bg-rose/5 p-5" role="alert">
-                    <p class="font-semibold text-rose">Please check the highlighted fields.</p>
-                </div>
-            @endif
+            <x-form-alert/>
 
             {{-- 1. Texture --}}
-            <fieldset>
+            <fieldset @error('texture_id') aria-describedby="e-texture" @enderror>
                 <legend class="mb-4 flex items-baseline gap-3 font-display text-[1.7rem]"><span class="text-gold-text">1</span> Texture</legend>
                 <div class="grid gap-3 sm:grid-cols-3">
                     @foreach($textures as $t)
@@ -33,12 +26,12 @@
                         </label>
                     @endforeach
                 </div>
-                @error('texture_id')<p class="err mt-2">{{ $message }}</p>@enderror
+                @error('texture_id')<p id="e-texture" class="err mt-2">{{ $message }}</p>@enderror
                 <p class="hint mt-3">Not sure? <a href="{{ route('match') }}" class="link">Take Texture Match</a>.</p>
             </fieldset>
 
             {{-- 2. Format --}}
-            <fieldset>
+            <fieldset @error('format') aria-describedby="e-format" @enderror>
                 <legend class="mb-4 flex items-baseline gap-3 font-display text-[1.7rem]"><span class="text-gold-text">2</span> How you’ll wear it</legend>
                 <div class="grid gap-3 sm:grid-cols-3">
                     @foreach(\App\Models\PreOrder::FORMATS as $value => $label)
@@ -50,12 +43,12 @@
                         </label>
                     @endforeach
                 </div>
-                @error('format')<p class="err mt-2">{{ $message }}</p>@enderror
+                @error('format')<p id="e-format" class="err mt-2">{{ $message }}</p>@enderror
                 <p class="hint mt-3">Have bundles already? <a href="{{ route('clipins') }}" class="link">We can turn them into clip-ins</a>.</p>
             </fieldset>
 
             {{-- 3. Set or length --}}
-            <fieldset>
+            <fieldset @error('price_set_id') aria-describedby="e-set" @enderror>
                 <legend class="mb-4 flex items-baseline gap-3 font-display text-[1.7rem]"><span class="text-gold-text">3</span> <span x-text="format === 'bundles' || !format ? 'Choose your set' : 'Choose your length'">Choose your set</span></legend>
 
                 <div x-show="format === 'bundles'" x-cloak>
@@ -74,7 +67,7 @@
                             </label>
                         </template>
                     </div>
-                    @error('price_set_id')<p class="err mt-2">{{ $message }}</p>@enderror
+                    @error('price_set_id')<p id="e-set" class="err mt-2">{{ $message }}</p>@enderror
                 </div>
 
                 <noscript>
@@ -94,19 +87,20 @@
                 <div x-show="format && format !== 'bundles'" class="grid gap-5" @if(! in_array($prefill['format'], ['ponytail', 'clip-ins'])) x-cloak @endif>
                     <label class="field max-w-[320px]">
                         <span>Length (for ponytails and clip-ins)</span>
-                        <select name="length" class="input" x-model.number="length">
+                        <select name="length" class="input" x-model.number="length" @error('length') aria-invalid="true" aria-describedby="e-length" @enderror>
                             <option value="">Choose a length</option>
                             @foreach($lengths as $l)<option value="{{ $l }}" @selected((int) $prefill['length'] === $l)>{{ $l }}″</option>@endforeach
                         </select>
-                        @error('length')<span class="err">{{ $message }}</span>@enderror
+                        @error('length')<span id="e-length" class="err">{{ $message }}</span>@enderror
                     </label>
-                    <div x-show="format === 'clip-ins'">
-                        <p class="label">Fullness</p>
+                    {{-- Only clip-ins have a fullness; disabled inputs are not sent with other formats. --}}
+                    <fieldset x-show="format === 'clip-ins'" :disabled="format !== 'clip-ins'">
+                        <legend class="label">Fullness</legend>
                         <div class="mt-2 grid gap-2 sm:grid-cols-2">
                             <label class="tile"><input type="radio" name="fullness" value="double" @checked(old('fullness', 'double') === 'double')><span class="grid"><span class="font-semibold">Double tracked</span><span class="tile-sub">Natural, everyday fullness</span></span></label>
                             <label class="tile"><input type="radio" name="fullness" value="triple" @checked(old('fullness') === 'triple')><span class="grid"><span class="font-semibold">Triple tracked</span><span class="tile-sub">Extra volume</span></span></label>
                         </div>
-                    </div>
+                    </fieldset>
                 </div>
                 <p class="hint mt-3" x-show="!format">Choose how you’ll wear it first.</p>
             </fieldset>

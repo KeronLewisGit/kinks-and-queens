@@ -5,6 +5,7 @@
     $rulerLengths = $uniform3->isNotEmpty() ? $uniform3 : $texture->activePriceSets->map(fn ($s) => $s->longest())->unique()->sort()->values();
     $start = $rulerLengths->contains(18) ? 18 : $rulerLengths->first();
     $cat = $catalogue[0];
+    $startFalls = \App\Models\Texture::FALLS_TO[$start] ?? 'your chosen length';
     // Same shape the length ruler script draws, so the figure shows hair without JavaScript too.
     $end = 172; $half = min(64, 36 + ($end - 80) * 0.14); $l = 100 - $half; $r = 100 + $half; $w = ($r - $l) / 7; $edge = '';
     for ($k = 0; $k < 7; $k++) { $x1 = $r - $k * $w; $x2 = $r - ($k + 1) * $w; $edge .= sprintf(' Q %.1f %.1f %.1f %.1f', ($x1 + $x2) / 2, $end + 9, $x2, $end); }
@@ -35,12 +36,12 @@
     </div>
 
     {{-- Length ruler --}}
-    <div class="reveal" style="--d:.1s" x-data="lengthRuler(@js($cat['sets']), @js($rulerLengths), {{ $start }})">
+    <div class="reveal" style="--d:.1s" x-data="lengthRuler(@js($cat['sets']), @js($rulerLengths), {{ $start }}, @js(\App\Models\Texture::FALLS_TO))">
         <div class="card p-6 sm:p-8">
             <h2 class="text-3xl">Length guide</h2>
             <p class="mt-2 text-cocoa">See roughly where each length falls, and what a set costs.</p>
             <div class="mt-6 grid grid-cols-[1fr_auto] items-stretch gap-6">
-                <svg viewBox="0 0 200 400" class="h-[340px] w-full" role="img" :aria-label="`${len} inch hair falls to about ${where}`" aria-label="{{ $start }} inch hair falls to about below the collarbone">
+                <svg viewBox="0 0 200 400" class="h-[340px] w-full" role="img" :aria-label="`${len} inch hair falls to about ${where}`" aria-label="{{ $start }} inch hair falls to about {{ $startFalls }}">
                     <path d="M88 90v16c-18 2-44 6-52 22-6 14-6 42-4 72l8 60c2 40-4 80-6 140h132c-2-60-8-100-6-140l8-60c2-30 2-58-4-72-8-16-34-20-52-22V90z" fill="#e9d8c3"/>
                     <path class="ruler-hair" :d="hairPath" d="{{ $hairPath }}" fill="#2b1a11"/>
                     <ellipse cx="100" cy="60" rx="25" ry="31" fill="#a8714f"/>
@@ -57,9 +58,9 @@
             </div>
             <label class="mt-6 block">
                 <span class="sr-only">Length in inches</span>
-                <input type="range" class="h-11 w-full cursor-pointer accent-[#845d1d]" :min="0" :max="lengths.length - 1" :value="lengths.indexOf(len)" @input="len = lengths[$event.target.value]" min="0" max="{{ $rulerLengths->count() - 1 }}" value="{{ $rulerLengths->search($start) }}" aria-label="Length">
+                <input type="range" class="h-11 w-full cursor-pointer accent-[#845d1d]" :min="0" :max="lengths.length - 1" :value="lengths.indexOf(len)" @input="len = lengths[$event.target.value]" min="0" max="{{ $rulerLengths->count() - 1 }}" value="{{ $rulerLengths->search($start) }}" :aria-valuetext="`${len} inches`" aria-valuetext="{{ $start }} inches">
             </label>
-            <p class="mt-3 text-cocoa" aria-live="polite">At <strong x-text="len + '″'">{{ $start }}″</strong>, hair falls to about <strong x-text="where"></strong>.</p>
+            <p class="mt-3 text-cocoa" aria-live="polite">At <strong x-text="len + '″'">{{ $start }}″</strong>, hair falls to about <strong x-text="where">{{ $startFalls }}</strong>.</p>
             <div class="mt-5 grid gap-2">
                 <template x-if="three"><a :href="`{{ route('preorder', ['texture' => $texture->slug]) }}&set=${three.id}`" class="flex min-h-12 items-center justify-between rounded-xl bg-ink px-4 text-ivory"><span x-text="three.label"></span><span class="font-semibold" x-text="money(three.price)"></span></a></template>
                 <template x-if="four"><a :href="`{{ route('preorder', ['texture' => $texture->slug]) }}&set=${four.id}`" class="flex min-h-12 items-center justify-between rounded-xl border border-sand bg-white px-4"><span x-text="four.label"></span><span class="font-semibold" x-text="money(four.price)"></span></a></template>

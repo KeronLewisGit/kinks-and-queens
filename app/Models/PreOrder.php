@@ -14,6 +14,8 @@ class PreOrder extends Model
      * Customer-facing journey. Labels and copy appear on the tracking page,
      * so they are written for the customer, not for staff.
      */
+    public const CONTACT_VIA = ['instagram' => 'Instagram DM', 'whatsapp' => 'WhatsApp', 'phone' => 'Phone call'];
+
     public const STATUSES = [
         'new' => ['label' => 'Request received', 'copy' => 'We have your request and will message you to confirm the details.'],
         'confirmed' => ['label' => 'Confirmed', 'copy' => 'Texture, lengths and price are confirmed with you.'],
@@ -55,7 +57,11 @@ class PreOrder extends Model
     {
         do {
             // No 0/O or 1/I so it reads cleanly over WhatsApp.
-            $ref = 'KQ-'.Str::upper(substr(str_shuffle(str_repeat('ABCDEFGHJKLMNPQRSTUVWXYZ23456789', 3)), 0, 5));
+            $alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            $ref = 'KQ-';
+            for ($i = 0; $i < 5; $i++) {
+                $ref .= $alphabet[random_int(0, strlen($alphabet) - 1)];
+            }
         } while (static::where('reference', $ref)->exists());
 
         return $ref;
@@ -84,6 +90,11 @@ class PreOrder extends Model
     public function scopeOpen(Builder $q): Builder
     {
         return $q->whereNotIn('status', ['completed', 'cancelled']);
+    }
+
+    public function contactViaLabel(): string
+    {
+        return self::CONTACT_VIA[$this->contact_via] ?? Str::headline((string) $this->contact_via);
     }
 
     public function statusLabel(): string
@@ -118,12 +129,13 @@ class PreOrder extends Model
             : implode('″ · ', $l).'″';
     }
 
-    public function phoneMatches(string $lastDigits): bool
+    /** Customers prove it's their order with the last four digits, however they type the number. */
+    public function phoneMatches(string $typed): bool
     {
-        $digits = preg_replace('/\D+/', '', $this->phone);
-        $given = preg_replace('/\D+/', '', $lastDigits);
+        $stored = preg_replace('/\D+/', '', $this->phone);
+        $given = preg_replace('/\D+/', '', $typed);
 
-        return strlen($given) >= 4 && str_ends_with($digits, $given);
+        return strlen($given) >= 4 && strlen($stored) >= 4 && substr($stored, -4) === substr($given, -4);
     }
 
     /** The message customers send us by WhatsApp or Instagram DM to open the conversation. */

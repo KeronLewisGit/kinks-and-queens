@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Mail\NewRequest;
+use App\Models\PreOrder;
 use App\Models\Texture;
 use Database\Seeders\CatalogueSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -83,5 +85,31 @@ class PublicSiteTest extends TestCase
     {
         $this->get('/')->assertHeader('X-Content-Type-Options', 'nosniff')->assertHeaderMissing('X-Robots-Tag');
         $this->get('/admin/login')->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+    }
+
+    public function test_robots_points_to_an_absolute_sitemap(): void
+    {
+        $this->get('/robots.txt')->assertOk()->assertHeader('Content-Type', 'text/plain; charset=UTF-8')
+            ->assertSee('Disallow: /admin')->assertSee('Sitemap: '.route('sitemap'));
+        $this->assertFileDoesNotExist(public_path('robots.txt'), 'a static file would shadow the route');
+    }
+
+    public function test_missing_pages_get_the_branded_404(): void
+    {
+        $this->get('/no-such-page')->assertNotFound()->assertSee('We can’t find that page.')->assertSee('See the textures');
+    }
+
+    public function test_length_guide_reads_well_without_javascript(): void
+    {
+        $this->get('/textures/brazilian-kinky-curly')->assertSee('falls to about <strong x-text="where">below the collarbone</strong>', false)
+            ->assertSee('aria-valuetext="18 inches"', false);
+    }
+
+    public function test_request_email_is_plain_text_without_html_entities(): void
+    {
+        $order = PreOrder::create(['kind' => 'hair', 'name' => "Ana O'Neil", 'phone' => '8685550123', 'contact_via' => 'phone', 'notes' => 'Colour <light> & soft']);
+        $text = (new NewRequest($order))->render();
+        $this->assertStringContainsString("Ana O'Neil", $text);
+        $this->assertStringContainsString('Colour <light> & soft', $text);
     }
 }

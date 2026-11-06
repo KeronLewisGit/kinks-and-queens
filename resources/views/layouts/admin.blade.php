@@ -19,10 +19,11 @@
     <meta name="robots" content="noindex, nofollow">
     <title>{{ $title ?? 'Admin' }} · Kinks &amp; Queens admin</title>
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    @include('partials.transition-guard')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-[#f4ede3]" x-data="{ nav: false }">
-    <svg width="0" height="0" class="absolute" aria-hidden="true"><defs><linearGradient id="kq-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e6c77f"/><stop offset=".55" stop-color="#b58a3c"/><stop offset="1" stop-color="#8c6421"/></linearGradient></defs></svg>
+    @include('partials.gold-gradient')
     <div class="lg:grid lg:grid-cols-[250px_1fr]">
         <aside class="bg-espresso text-ivory lg:sticky lg:top-0 lg:h-screen">
             <div class="flex items-center justify-between p-5">

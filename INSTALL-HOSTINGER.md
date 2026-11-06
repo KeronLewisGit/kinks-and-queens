@@ -76,3 +76,5 @@ public_html/
 4. Open `https://YOUR-DOMAIN/setup.php?token=YOUR_SETUP_TOKEN`, then create the owner account on that page.
 
 Updating: run `npm run build` if CSS or JS changed, commit, push to `main`, then click **Deploy** in hPanel → GIT (or turn on Auto Deployment there and add its webhook URL to the GitHub repository). A pull never touches `.env`, `vendor/`, `storage/` or `public/uploads/`.
+
+After every deploy Composer runs `php artisan app:deployed`, which applies new migrations and rebuilds the route, config and view caches, so nothing else needs to run by hand. It does nothing on a machine without a production `.env`. Hostinger's Git deploy runs Composer with PHP 8.2, so the Composer scripts call `/opt/alt/php84/usr/bin/php` when it exists.

@@ -30,6 +30,23 @@ class TrackingTest extends TestCase
     {
         $o = $this->order();
         $this->get(route('track.show', $o))->assertRedirect(route('track'));
+        // An unknown reference looks exactly like a real one without the session: no 404 to probe with.
+        $this->get('/track/KQ-ZZZZZ')->assertRedirect(route('track'));
+        $this->get('/pre-order/sent/KQ-ZZZZZ')->assertRedirect(route('track'));
+    }
+
+    public function test_lookup_accepts_the_number_however_it_is_typed(): void
+    {
+        $o = PreOrder::create(['kind' => 'hair', 'name' => 'Short', 'phone' => '555-0123', 'contact_via' => 'phone']);
+        $this->post('/track', ['reference' => $o->reference, 'phone' => '1 868 555 0123'])->assertRedirect(route('track.show', $o));
+        $this->post('/track', ['reference' => $o->reference, 'phone' => '123'])->assertSessionHasErrors('reference');
+    }
+
+    public function test_references_are_unique_and_readable(): void
+    {
+        $refs = collect(range(1, 200))->map(fn () => PreOrder::newReference());
+        $this->assertSame(200, $refs->unique()->count());
+        $refs->each(fn ($r) => $this->assertMatchesRegularExpression('/^KQ-[A-HJ-NP-Z2-9]{5}$/', $r));
     }
 
     public function test_customer_sees_status_notes_and_expected_date(): void

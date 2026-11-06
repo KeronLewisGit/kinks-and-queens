@@ -1,5 +1,0 @@
-User-agent: *
-Disallow: /admin
-Disallow: /track/
-Disallow: /pre-order/sent/
-Sitemap: /sitemap.xml

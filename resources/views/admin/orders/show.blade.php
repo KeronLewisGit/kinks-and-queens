@@ -37,7 +37,7 @@
                 <div><dt class="hint">Instagram</dt><dd class="font-semibold">@if($order->instagram)<a class="link" href="https://www.instagram.com/{{ $order->instagram }}/" rel="noopener" target="_blank">{{ '@'.$order->instagram }}</a>@else — @endif</dd></div>
                 <div><dt class="hint">Email</dt><dd class="font-semibold">{{ $order->email ?: '—' }}</dd></div>
                 <div><dt class="hint">Area</dt><dd class="font-semibold">{{ $order->area ?: '—' }}</dd></div>
-                <div><dt class="hint">Prefers</dt><dd class="font-semibold">{{ ['instagram' => 'Instagram DM', 'whatsapp' => 'WhatsApp', 'phone' => 'Phone call'][$order->contact_via] ?? $order->contact_via }}</dd></div>
+                <div><dt class="hint">Prefers</dt><dd class="font-semibold">{{ $order->contactViaLabel() }}</dd></div>
             </dl>
             <div class="mt-5 flex flex-wrap gap-3">
                 @if($whatsapp)<a href="{{ $whatsapp }}" class="btn btn-primary !min-h-11" target="_blank" rel="noopener">Message on WhatsApp</a>@endif

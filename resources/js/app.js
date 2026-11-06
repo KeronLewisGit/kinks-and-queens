@@ -1,13 +1,22 @@
 import Alpine from 'alpinejs';
-import collapse from '@alpinejs/collapse';
 import focus from '@alpinejs/focus';
 
 document.documentElement.classList.add('js');
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const money = (n) => 'TT$' + Number(n).toLocaleString('en-TT');
 
-/* Reveal on scroll. Without JS or with reduced motion everything is simply visible. */
+/* Reveal on scroll. Without JS or with reduced motion everything is simply visible.
+   During the first-visit splash nothing is observed yet, so content reveals as the curtain lifts
+   (or the moment a visitor taps to skip it). */
 function reveal() {
+    const root = document.documentElement;
+    if (root.classList.contains('is-splash')) {
+        const mo = new MutationObserver(() => {
+            if (!root.classList.contains('is-splash')) { mo.disconnect(); reveal(); }
+        });
+        mo.observe(root, { attributes: true, attributeFilter: ['class'] });
+        return;
+    }
     const els = document.querySelectorAll('.reveal, .coil.draw');
     if (reduced || !('IntersectionObserver' in window)) {
         els.forEach((el) => el.classList.add('is-in'));
@@ -46,6 +55,36 @@ function navProgress() {
     window.addEventListener('pageshow', stop);
 }
 
+/* Forms marked data-once send once: a double tap or a slow connection can't create two requests.
+   The server also ignores a repeated submission token, this just keeps the button honest. */
+function submitOnce() {
+    document.addEventListener('submit', (e) => {
+        const form = e.target;
+        if (!(form instanceof HTMLFormElement) || !form.hasAttribute('data-once')) return;
+        if (form.dataset.sending) { e.preventDefault(); return; }
+        form.dataset.sending = '1';
+        form.setAttribute('aria-busy', 'true');
+        // Disable after the browser has collected the form data.
+        setTimeout(() => form.querySelectorAll('button[type=submit], button:not([type])').forEach((b) => { b.disabled = true; }), 0);
+    });
+    // Coming back with Back restores the page from cache: make its forms usable again.
+    window.addEventListener('pageshow', () => document.querySelectorAll('form[data-sending]').forEach((form) => {
+        delete form.dataset.sending;
+        form.removeAttribute('aria-busy');
+        form.querySelectorAll('button').forEach((b) => { b.disabled = false; });
+    }));
+}
+
+/* After a failed submit, move focus to the summary so screen readers announce it. */
+function focusErrors() {
+    const alert = document.querySelector('[data-error-summary]');
+    if (alert) { alert.setAttribute('tabindex', '-1'); alert.focus({ preventScroll: false }); }
+}
+
+/* An outgoing page transition cancelled mid-way (Back, a fast second click) is not an error.
+   The incoming side is handled by the inline script in the layout head, which runs before pagereveal. */
+window.addEventListener('pageswap', (e) => { const vt = e.viewTransition; if (vt) [vt.ready, vt.finished, vt.updateCallbackDone].forEach((p) => p?.catch(() => {})); });
+
 /* Header picks up a background once the page scrolls. */
 function stickyHeader() {
     const header = document.querySelector('.site-header');
@@ -61,17 +100,19 @@ Alpine.data('textureSwitcher', (items) => ({
     i: 0,
     timer: null,
     get current() { return this.items[this.i]; },
-    pick(i) { this.i = i; this.stop(); },
+    picked: false,
+    pick(i) { this.i = i; this.picked = true; this.stop(); },
     start() {
-        if (reduced || this.items.length < 2) return;
+        if (reduced || this.picked || this.timer || this.items.length < 2) return;
         this.timer = setInterval(() => { this.i = (this.i + 1) % this.items.length; }, 5200);
     },
+    // Rotation pauses while the pointer or keyboard focus is on the hero, and stops for good once someone picks.
     stop() { clearInterval(this.timer); this.timer = null; },
     money,
 }));
 
 /* Length ruler on texture pages: where each length falls, and what a set costs. */
-Alpine.data('lengthRuler', (sets, lengths, start) => ({
+Alpine.data('lengthRuler', (sets, lengths, start, fallsTo) => ({
     sets,
     lengths,
     len: start,
@@ -82,8 +123,7 @@ Alpine.data('lengthRuler', (sets, lengths, start) => ({
     get four() { return this.sets.find((s) => s.count === 4 && s.uniform && s.lengths[0] === this.len); },
     get two() { return this.sets.find((s) => s.count === 2 && s.uniform && s.lengths[0] === this.len); },
     get where() {
-        const map = { 10: 'the chin', 12: 'just above the shoulders', 14: 'the shoulders', 16: 'the collarbone', 18: 'below the collarbone', 20: 'mid-chest', 22: 'the bra strap', 24: 'mid-back', 26: 'the waist', 28: 'past the waist' };
-        return map[this.len] ?? '';
+        return fallsTo[this.len] ?? 'your chosen length';
     },
     // Hair silhouette: frames the face, then falls to the chosen length with a curly, scalloped edge.
     get hairPath() {
@@ -194,7 +234,6 @@ Alpine.data('copy', (text) => ({
     },
 }));
 
-Alpine.plugin(collapse);
 Alpine.plugin(focus);
 window.Alpine = Alpine;
 Alpine.start();
@@ -202,3 +241,5 @@ Alpine.start();
 reveal();
 stickyHeader();
 navProgress();
+submitOnce();
+focusErrors();

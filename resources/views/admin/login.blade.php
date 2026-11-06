@@ -4,10 +4,11 @@
     <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow">
     <title>Sign in · Kinks &amp; Queens</title>
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    @include('partials.transition-guard')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="grid min-h-screen place-items-center bg-espresso p-5">
-    <svg width="0" height="0" class="absolute" aria-hidden="true"><defs><linearGradient id="kq-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e6c77f"/><stop offset=".55" stop-color="#b58a3c"/><stop offset="1" stop-color="#8c6421"/></linearGradient></defs></svg>
+    @include('partials.gold-gradient')
     <main class="w-full max-w-[420px] rounded-[1.75rem] bg-ivory p-8">
         <x-logo/>
         <h1 class="mt-8 text-3xl">Sign in</h1>
