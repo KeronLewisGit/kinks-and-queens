@@ -3,7 +3,10 @@
     "name": "laravel/laravel",
     "type": "project",
     "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "keywords": [
+        "laravel",
+        "framework"
+    ],
     "license": "MIT",
     "require": {
         "php": "^8.3",
@@ -48,11 +51,10 @@
             "@php artisan test"
         ],
         "post-autoload-dump": [
-            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
+            "P=\"\"; for b in /opt/alt/php84/usr/bin/php /opt/alt/php85/usr/bin/php; do if [ -x \"$b\" ]; then P=\"$b\"; break; fi; done; P=\"${P:-$PHP_BINARY}\"; \"$P\" artisan clear-compiled && \"$P\" artisan package:discover --ansi"
         ],
         "post-update-cmd": [
-            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+            "P=\"\"; for b in /opt/alt/php84/usr/bin/php /opt/alt/php85/usr/bin/php; do if [ -x \"$b\" ]; then P=\"$b\"; break; fi; done; P=\"${P:-$PHP_BINARY}\"; \"$P\" artisan vendor:publish --tag=laravel-assets --ansi --force"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
