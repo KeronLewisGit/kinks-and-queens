@@ -13,7 +13,12 @@ Artisan::command('app:deployed', function () {
 
         return 0;
     }
-    $this->call('migrate', ['--force' => true]);
+    // A failed migration fails the Composer run, so Hostinger reports the deploy as failed.
+    if ($this->call('migrate', ['--force' => true]) !== 0) {
+        $this->error('Migrations failed: the deploy is not complete.');
+
+        return 1;
+    }
     $this->call('optimize:clear');
     $this->call('optimize');
 

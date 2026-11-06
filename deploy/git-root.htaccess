@@ -13,7 +13,8 @@
     RewriteCond %{HTTP:X-Forwarded-Proto} !https
     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-    # The one-time installer runs from here until it deletes itself
+    # The one-time installer runs from here until it deletes itself; after that Laravel shows its 404
+    RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^setup\.php$ - [L]
 
     # Never serve a leftover zip-package app folder or dotfiles
