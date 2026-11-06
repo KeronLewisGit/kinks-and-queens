@@ -39,7 +39,7 @@ class PhotoController extends Controller
 
         GalleryPhoto::create([
             'path' => $path, 'alt' => $data['alt'], 'caption' => $data['caption'] ?? null, 'label' => $data['label'] ?? null,
-            'texture_id' => $data['texture_id'] ?? null, 'sort' => -1 * time() % 100000,
+            'texture_id' => $data['texture_id'] ?? null, 'sort' => (int) GalleryPhoto::min('sort') - 1,
         ]);
 
         return back()->with('ok', 'Photo added to the Queen Cam gallery.');

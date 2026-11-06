@@ -96,6 +96,7 @@ class AdminTest extends TestCase
         ])->assertRedirect();
         $photo = GalleryPhoto::where('alt', 'Ponytail side view')->first();
         Storage::disk('public')->assertExists($photo->path);
+        $this->assertSame($photo->id, GalleryPhoto::orderBy('sort')->first()->id, 'new uploads lead the gallery');
 
         $this->actingAs($this->staff)->patch('/admin/photos/'.$photo->id, ['alt' => 'Ponytail', 'sort' => 0])->assertRedirect();
         $this->assertFalse($photo->fresh()->is_visible);

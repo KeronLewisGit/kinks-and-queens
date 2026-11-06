@@ -82,7 +82,7 @@ return new class extends Migration
             $table->string('caption')->nullable();
             $table->string('label', 30)->nullable();     // Queen Cam, Client Cam, Texture Shot
             $table->foreignId('texture_id')->nullable()->constrained()->nullOnDelete();
-            $table->unsignedSmallInteger('sort')->default(0);
+            $table->integer('sort')->default(0); // signed: new uploads go to the front with min - 1
             $table->boolean('is_visible')->default(true);
             $table->timestamps();
         });
