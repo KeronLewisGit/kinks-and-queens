@@ -7,9 +7,15 @@ use Symfony\Component\Console\Output\BufferedOutput;
 
 /**
  * One-time installer for hosts without SSH. Visit /setup.php?token=YOUR_SETUP_TOKEN
- * after uploading the package and filling in kq-app/.env. Deletes itself when done.
+ * after uploading the app and filling in its .env. Deletes itself when done.
+ *
+ * Works with both layouts: the zip package (app in kq-app/, public files in the web root)
+ * and a Git deployment (repository cloned into kq-src/, public files in kq-src/public).
  */
-$appPath = __DIR__.'/kq-app';
+$gitLayout = is_dir(__DIR__.'/kq-src/app');
+$appPath = $gitLayout ? __DIR__.'/kq-src' : __DIR__.'/kq-app';
+$publicPath = $gitLayout ? $appPath.'/public' : __DIR__;
+$appFolder = basename($appPath);
 $envFile = $appPath.'/.env';
 header('Content-Type: text/html; charset=utf-8');
 header('X-Robots-Tag: noindex, nofollow');
@@ -17,7 +23,7 @@ echo '<!doctype html><meta name="viewport" content="width=device-width"><title>K
 echo '<h1>Kinks &amp; Queens installer</h1>';
 
 if (! file_exists($envFile)) {
-    exit('<p style="color:#a4473a">kq-app/.env not found. Copy kq-app/.env.example to kq-app/.env and fill in the database details first.</p>');
+    exit('<p style="color:#a4473a">'.$appFolder.'/.env not found. Copy '.$appFolder.'/.env.example to '.$appFolder.'/.env and fill in the database details first.</p>');
 }
 $env = [];
 foreach (file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
@@ -37,7 +43,7 @@ if (strlen($token) < 32 || ! is_string($given) || ! hash_equals($token, $given))
 
 require $appPath.'/vendor/autoload.php';
 $app = require $appPath.'/bootstrap/app.php';
-$app->usePublicPath(__DIR__);
+$app->usePublicPath($publicPath);
 $kernel = $app->make(Kernel::class);
 $kernel->bootstrap();
 

@@ -1,0 +1,107 @@
+{
+  "_fonts-C9MNnjVw.css": {
+    "file": "assets/fonts-C9MNnjVw.css",
+    "src": "_fonts-C9MNnjVw.css"
+  },
+  "_instrument-sans-400-normal-D1W7dsQl.woff": {
+    "file": "assets/instrument-sans-400-normal-D1W7dsQl.woff",
+    "src": "_instrument-sans-400-normal-D1W7dsQl.woff"
+  },
+  "_instrument-sans-400-normal-DRC__1Mx.woff2": {
+    "file": "assets/instrument-sans-400-normal-DRC__1Mx.woff2",
+    "src": "_instrument-sans-400-normal-DRC__1Mx.woff2"
+  },
+  "_instrument-sans-500-normal-Dk9ku72i.woff2": {
+    "file": "assets/instrument-sans-500-normal-Dk9ku72i.woff2",
+    "src": "_instrument-sans-500-normal-Dk9ku72i.woff2"
+  },
+  "_instrument-sans-500-normal-Z6ESRlEs.woff": {
+    "file": "assets/instrument-sans-500-normal-Z6ESRlEs.woff",
+    "src": "_instrument-sans-500-normal-Z6ESRlEs.woff"
+  },
+  "_instrument-sans-600-normal-B7fBEWYG.woff2": {
+    "file": "assets/instrument-sans-600-normal-B7fBEWYG.woff2",
+    "src": "_instrument-sans-600-normal-B7fBEWYG.woff2"
+  },
+  "_instrument-sans-600-normal-B9e8oLYv.woff": {
+    "file": "assets/instrument-sans-600-normal-B9e8oLYv.woff",
+    "src": "_instrument-sans-600-normal-B9e8oLYv.woff"
+  },
+  "node_modules/@fontsource-variable/albert-sans/files/albert-sans-latin-ext-wght-normal.woff2": {
+    "file": "assets/albert-sans-latin-ext-wght-normal-BAo4qCk1.woff2",
+    "src": "node_modules/@fontsource-variable/albert-sans/files/albert-sans-latin-ext-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/albert-sans/files/albert-sans-latin-wght-normal.woff2": {
+    "file": "assets/albert-sans-latin-wght-normal-BJ0ssN8N.woff2",
+    "src": "node_modules/@fontsource-variable/albert-sans/files/albert-sans-latin-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/playfair-display/files/playfair-display-cyrillic-wght-italic.woff2": {
+    "file": "assets/playfair-display-cyrillic-wght-italic-D5dBZ3aJ.woff2",
+    "src": "node_modules/@fontsource-variable/playfair-display/files/playfair-display-cyrillic-wght-italic.woff2"
+  },
+  "node_modules/@fontsource-variable/playfair-display/files/playfair-display-cyrillic-wght-normal.woff2": {
+    "file": "assets/playfair-display-cyrillic-wght-normal-5WvUvBgz.woff2",
+    "src": "node_modules/@fontsource-variable/playfair-display/files/playfair-display-cyrillic-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/playfair-display/files/playfair-display-latin-ext-wght-italic.woff2": {
+    "file": "assets/playfair-display-latin-ext-wght-italic-ze_cPdSg.woff2",
+    "src": "node_modules/@fontsource-variable/playfair-display/files/playfair-display-latin-ext-wght-italic.woff2"
+  },
+  "node_modules/@fontsource-variable/playfair-display/files/playfair-display-latin-ext-wght-normal.woff2": {
+    "file": "assets/playfair-display-latin-ext-wght-normal-CT1r92Rl.woff2",
+    "src": "node_modules/@fontsource-variable/playfair-display/files/playfair-display-latin-ext-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/playfair-display/files/playfair-display-latin-wght-italic.woff2": {
+    "file": "assets/playfair-display-latin-wght-italic-DmbndNpe.woff2",
+    "src": "node_modules/@fontsource-variable/playfair-display/files/playfair-display-latin-wght-italic.woff2"
+  },
+  "node_modules/@fontsource-variable/playfair-display/files/playfair-display-latin-wght-normal.woff2": {
+    "file": "assets/playfair-display-latin-wght-normal-BOwq7MWX.woff2",
+    "src": "node_modules/@fontsource-variable/playfair-display/files/playfair-display-latin-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/playfair-display/files/playfair-display-vietnamese-wght-italic.woff2": {
+    "file": "assets/playfair-display-vietnamese-wght-italic-DUEcMSM3.woff2",
+    "src": "node_modules/@fontsource-variable/playfair-display/files/playfair-display-vietnamese-wght-italic.woff2"
+  },
+  "node_modules/@fontsource-variable/playfair-display/files/playfair-display-vietnamese-wght-normal.woff2": {
+    "file": "assets/playfair-display-vietnamese-wght-normal-Cabi7G8-.woff2",
+    "src": "node_modules/@fontsource-variable/playfair-display/files/playfair-display-vietnamese-wght-normal.woff2"
+  },
+  "node_modules/@fontsource/allura/files/allura-latin-400-normal.woff": {
+    "file": "assets/allura-latin-400-normal-DcxZAN6k.woff",
+    "src": "node_modules/@fontsource/allura/files/allura-latin-400-normal.woff"
+  },
+  "node_modules/@fontsource/allura/files/allura-latin-400-normal.woff2": {
+    "file": "assets/allura-latin-400-normal-4sUZKTf1.woff2",
+    "src": "node_modules/@fontsource/allura/files/allura-latin-400-normal.woff2"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-Bojlxljz.css",
+    "name": "app",
+    "names": [
+      "app.css"
+    ],
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "assets": [
+      "assets/playfair-display-cyrillic-wght-normal-5WvUvBgz.woff2",
+      "assets/playfair-display-vietnamese-wght-normal-Cabi7G8-.woff2",
+      "assets/playfair-display-latin-ext-wght-normal-CT1r92Rl.woff2",
+      "assets/playfair-display-latin-wght-normal-BOwq7MWX.woff2",
+      "assets/playfair-display-cyrillic-wght-italic-D5dBZ3aJ.woff2",
+      "assets/playfair-display-vietnamese-wght-italic-DUEcMSM3.woff2",
+      "assets/playfair-display-latin-ext-wght-italic-ze_cPdSg.woff2",
+      "assets/playfair-display-latin-wght-italic-DmbndNpe.woff2",
+      "assets/albert-sans-latin-ext-wght-normal-BAo4qCk1.woff2",
+      "assets/albert-sans-latin-wght-normal-BJ0ssN8N.woff2",
+      "assets/allura-latin-400-normal-4sUZKTf1.woff2",
+      "assets/allura-latin-400-normal-DcxZAN6k.woff"
+    ]
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-DCB3CKXS.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  }
+}

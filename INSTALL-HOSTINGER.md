@@ -56,3 +56,23 @@ php artisan app:create-admin --name="Owner" --email=owner@example.com --password
 php artisan optimize
 rm ../setup.php
 ```
+
+## Git deployment instead of the zip (for ongoing updates)
+
+The repository is public, so Hostinger can clone it without a deploy key. Built CSS and JS (`public/build`) are committed because Hostinger does not run npm. Composer runs on the server after each pull.
+
+Layout in `public_html/`:
+
+```
+public_html/
+├── .htaccess        ← copy of deploy/git-root.htaccess (passes every request to kq-src/public)
+├── setup.php        ← copy of deploy/setup.php, until it deletes itself
+└── kq-src/          ← the Git checkout; .env lives here and is never tracked
+```
+
+1. hPanel → Advanced → **GIT** → Create a new repository. Repository: `https://github.com/KeronLewisGit/kinks-and-queens.git`, branch `main`, directory `kq-src`. Click **Deploy**.
+2. In File Manager, upload `deploy/git-root.htaccess` to `public_html/.htaccess`, and `deploy/setup.php` to `public_html/setup.php`.
+3. Copy `deploy/env.production.example` to `public_html/kq-src/.env` and fill it in with the same values as the zip install.
+4. Open `https://YOUR-DOMAIN/setup.php?token=YOUR_SETUP_TOKEN`, then create the owner account on that page.
+
+Updating: run `npm run build` if CSS or JS changed, commit, push to `main`, then click **Deploy** in hPanel → GIT (or turn on Auto Deployment there and add its webhook URL to the GitHub repository). A pull never touches `.env`, `vendor/`, `storage/` or `public/uploads/`.

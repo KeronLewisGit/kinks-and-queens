@@ -1,0 +1,44 @@
+# Hostinger Git deployment: the repository is cloned into public_html/kq-src and this
+# file sits in public_html/. Every request is passed to kq-src/public, so the app code,
+# .env, vendor/ and .git/ are never served.
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    # Force HTTPS
+    RewriteCond %{HTTPS} !=on
+    RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # The one-time installer runs from here until it deletes itself
+    RewriteRule ^setup\.php$ - [L]
+
+    # Never serve a leftover zip-package app folder or dotfiles
+    RewriteRule ^kq-app(/|$) - [F,L]
+    RewriteRule (^|/)\.(?!well-known) - [F,L]
+
+    RewriteCond %{REQUEST_URI} !^/kq-src/public/
+    RewriteRule ^(.*)$ kq-src/public/$1 [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" "expr=%{HTTPS} == 'on'"
+</IfModule>
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/svg+xml "access plus 1 month"
+    ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
